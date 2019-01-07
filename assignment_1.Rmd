@@ -28,35 +28,35 @@ is.matrix(B)
 ```
 
 ```{r}
-#find A + B 
+# find A + B 
 A + B
 
-#and A - B
+# and A - B
 A - B
 ```
 
 ```{r}
-#find A'A 
+# find A'A 
 t(A) %*% A
 
-#and AA'
+# and AA'
 A %*% t(A)
 ```
 
 # Q 2.2
 ```{r}
-#Find (A + B)' 
+# Find (A + B)' 
 t(A + B)
 
-#and A' + B' 
+# and A' + B' 
 t(A) + t(B)
 
-#and compare them, thus illustrating (2.15).
+# and compare them, thus illustrating (2.15).
 (t(A + B)) - (t(A) + t(B))
 ```
 
 ```{r}
-#Show that (A')' = A, thus illustrating (2.6).
+# Show that (A')' = A, thus illustrating (2.6).
 A
 t(t(A))
 
@@ -73,13 +73,12 @@ B <- matrix(c(2,0,1,5),
             nrow = 2, 
             ncol = 2, 
             byrow = TRUE)
-A
-B
-#Find AB 
 
+#Find AB 
+A*B
 
 #and BA.
-
+B*A
 ```
 
 # Q 2.14
@@ -104,12 +103,21 @@ C
 ```
 
 ```{r}
-#Find AB and CB. 
+# Find AB 
+A %*% B
 
-#Are they equal? 
+# and CB. 
+C %*% B
 
-#What is the rank of A, B, and C?
+# Are they equal? 
+A %*% B - C %*% B
+# subtracting one from the other shows that they are equal.
 
+# What is the rank of A, B, and C?
+Matrix::rankMatrix(A)[1]
+Matrix::rankMatrix(B)[1]
+Matrix::rankMatrix(C)[1]
+#The rank of each matrix A, B, and C is 2.
 ```
 
 # Q 2.18
@@ -118,11 +126,20 @@ A <- matrix(c(1,-1,1,2,1,0,1,-1,-1),
             nrow = 3,
             ncol = 3,
             byrow = TRUE)
+###### leaving off here for the day...
 
+
+A
 #Normalize the columns of A by dividing each column by its length; denote the resulting matrix by C.
+prop.table(A, 1)
 
+sum(A[,1])/ncol(A)
+sum(A[,2])/ncol(A)
+sum(A[,3])/ncol(A)
 
+matlib::GramSchmidt(A, normalize = TRUE, verbose = TRUE)
 #Show that C is an orthogonal matrix, that is, C'C = C C = I.
+t(C) %*% C 
 
 ```
 
