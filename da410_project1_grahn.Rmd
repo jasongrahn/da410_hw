@@ -70,7 +70,17 @@ airpol.data.sub.std <- sweep(x = airpol.data.num.sub, #sweep the airpol data
 #find the distance matrix for the dataframe using all the default options
 dis <- dist(airpol.data.sub.std)
 
-dis.matrix <- dis2full
+dist2full <- function(ds) { 
+  n <- attr(ds,"Size") 
+  full <- matrix(0,n,n) 
+  full[lower.tri(full)] <- ds 
+  full+t(full) 
+  } 
+
+dis.matrix <- round(dist2full(dis), 2)
+
+dis.matrix
+
 ```
 
 
