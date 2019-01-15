@@ -58,7 +58,6 @@ The data in Table 3.8 consist of head measurements on first and second sons (Fre
    
 ##(a) Find the mean vector for all four variables and partition it into (y-hat / x-hat) as in (3.41).
 ```{r}
-
 table_3_8 <- matrix(c(191,195,181,183,176,208,189,197,188,192,179,183,174,190,188,163,195,
                       186,181,175,192,174,176,197,190,155,149,148,153,144,157,150,159,152,
                       150,158,147,150,159,151,137,155,153,145,140,154,143,139,167,163,179,
@@ -67,12 +66,16 @@ table_3_8 <- matrix(c(191,195,181,183,176,208,189,197,188,192,179,183,174,190,18
                       148,147,152,157,158,130,158,148,146,137,152,147,143,158,150),
                     ncol = 4, byrow = FALSE)
 
-#table_3_8
+#View(table_3_8)
 
+#get the column means as a 4x1 matrix
+ymeans <- matrix(colMeans(table_3_8))
+ymeans
 ```
     
 ##(b) Find the covariance matrix for all four variables and partition it into S as in (3.42).
 ```{r}
-
+S <- round(var(table_3_8), 2)
+S
 ```
 
