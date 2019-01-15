@@ -1,0 +1,77 @@
+---
+title: "da_410_project2_grahn"
+author: "Jason Grahn"
+date: "1/14/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = TRUE,
+	warning = TRUE,
+	include = FALSE
+)
+library(tidyverse)
+```
+
+
+##Download airpoll.txt. In this problem, we will only focus on the first 16 observations (cities). Read the data into R (as a data frame) and name the data as airpol.full. Then use the following code to “extract” the first 16 observations.
+```{r}
+#import the dataset from a better location.
+airpol.full <- read.table("http://www.stat.sc.edu/~hitchcock/airpoll.txt", header=T)
+
+#extract the first 16 observations
+city.names <- as.character(airpol.full[1:16,1]) 
+airpol.data.sub <- airpol.full[1:16,2:8]
+
+airpol.data.sub
+```
+
+##Use R to perform the following analysis on the subset data airpol.data.sub. Make sure you include clear headings, command lines, and relevant output/results.
+
+###a) Calculate the sample covariance matrix and the sample correlation matrix. 
+```{r}
+#sample covariance matrix
+S <- round(var(airpol.data.sub), 2)
+S
+
+#sample correlation matrix
+R <- round(cor(airpol.data.sub), 2)
+R
+
+#Identify which pairs of variables seem to be strongly associated
+#and describe the nature (strength and direction) of the relationship between these variable pairs.
+library(ggcorrplot)
+ggcorrplot(R)#, type = "upper", outline.col = "white")
+ggcorrplot(R, 
+           type = "lower",
+           title = "correlation matrix of airpol.data.",
+           show.legend = TRUE,
+           digits = 2,
+           lab = TRUE)
+```
+
+From the plot we can see NOX and SO2 have the strongest correlation of the data, headed positive. the most negative is Education and Mortality. SO2 and Popden is also a semi-strong positive relationship. Everything else sits in a sort-of weak relationship.
+
+###(b) Calculate the distance matrix for these observations (after scaling the variables by dividing each variable by its standard deviation). Describe some of the most similar pairs of cities and some of the most different pairs of cities, giving evidence from the distance matrix.
+```{r}
+std <- sapply(airpol.data.sub, sd)  #find standard deviation for variables
+
+#divide each variable by its std to normalize the data
+airpol.data.sub.std <- sweep(x = airpol.data.sub, #sweep the airpol data
+                             MARGIN = 2, #dunno what the MARGIN 
+                             STATS = std, #using the standard deviation
+                             FUN = "/") #by division 
+
+#find the distance matrix for the dataframe using all the default options
+dis <- dist(airpol.data.sub.std)
+
+dis.matrix <- dis2full
+```
+
+
+###c) Display a plot that will help assess whether this data set comes from a multivariate normal distribution. What is your conclusion based on the plot?
+```{r}
+
+```
+
