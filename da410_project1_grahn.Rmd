@@ -6,18 +6,13 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-	message = TRUE,
-	warning = TRUE,
-	include = FALSE
-)
+knitr::opts_chunk$set(message = TRUE, warning = TRUE)
 library(tidyverse)
 ```
 
-
 ##Download airpoll.txt. In this problem, we will only focus on the first 16 observations (cities). Read the data into R (as a data frame) and name the data as airpol.full. Then use the following code to “extract” the first 16 observations.
 ```{r}
-#import the dataset from a better location.
+#import the dataset dataset as a better table.
 airpol.full <- read.csv("airpoll.txt", header = TRUE, sep = " ")
 
 #This is old bad code.
@@ -25,7 +20,10 @@ airpol.full <- read.csv("airpoll.txt", header = TRUE, sep = " ")
 
 #extract the first 16 observations
 airpol.data.sub <- head(airpol.full, 16)
+```
 
+##Display the subset data airpol.data.sub
+```{r}
 #show that table
 airpol.data.sub
 airpol.data.num.sub <- airpol.data.sub %>% select(Rainfall:Mortality)
@@ -56,7 +54,7 @@ ggcorrplot(R,
 
 From the plot we can see NOX and SO2 have the strongest correlation of the data, headed positive. the most negative is Education and Mortality. SO2 and Popden is also a semi-strong positive relationship. Everything else sits in a sort-of weak relationship.
 
-###(b) Calculate the distance matrix for these observations (after scaling the variables by dividing each variable by its standard deviation). Describe some of the most similar pairs of cities and some of the most different pairs of cities, giving evidence from the distance matrix.
+###(b) Calculate the distance matrix for these observations (after scaling the variables by dividing each variable by its standard deviation). 
 ```{r}
 #find standard deviation for variables
 std <- sapply(airpol.data.num.sub, sd)  
@@ -74,18 +72,47 @@ dist2full <- function(ds) {
   n <- attr(ds,"Size") 
   full <- matrix(0,n,n) 
   full[lower.tri(full)] <- ds 
-  full+t(full) 
+  full + t(full) 
   } 
 
 dis.matrix <- round(dist2full(dis), 2)
-
 dis.matrix
+```
 
+##Describe some of the most similar pairs of cities and some of the most different pairs of cities, giving evidence from the distance matrix.
+```{r}
+library(RVAideMemoire)
+mqqnorm(as.matrix(airpol.data.sub))
+
+dist_m <- as.matrix(dis)
+dist_m
+
+dis
 ```
 
 
-###c) Display a plot that will help assess whether this data set comes from a multivariate normal distribution. What is your conclusion based on the plot?
+###(c) Display a plot that will help assess whether this data set comes from a multivariate normal distribution. What is your conclusion based on the plot?
 ```{r}
+#Copy the chisplot function into R 
+chisplot <- function(x) { 
+  if (!is.matrix(x)) stop("x is not a matrix") 
+  ### determine dimensions 
+  n <- nrow(x) 
+  p <- ncol(x) 
+  xbar <- apply(x, 2, mean) 
+  S <- var(x) 
+  S <- solve(S) 
+  index <- (1:n)/(n+1)
+  xcent <- t(t(x) - xbar) 
+  di <- apply(xcent, 1, function(x,S) x %*% S %*% x,S) 
+  quant <- qchisq(index,p) 
+  plot(quant, sort(di), 
+       ylab = "Ordered distances", 
+       xlab = "Chi-square quantile", 
+       lwd=2,
+       pch=1)
+  }
 
+chisplot(as.matrix(airpol.data.num.sub))
 ```
 
