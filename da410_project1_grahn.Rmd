@@ -8,6 +8,8 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message = TRUE, warning = TRUE)
 library(tidyverse)
+library(dendextend)
+
 ```
 
 ##Download airpoll.txt. In this problem, we will only focus on the first 16 observations (cities). Read the data into R (as a data frame) and name the data as airpol.full. Then use the following code to “extract” the first 16 observations.
@@ -81,12 +83,28 @@ dis.matrix
 
 ##Describe some of the most similar pairs of cities and some of the most different pairs of cities, giving evidence from the distance matrix.
 ```{r}
+#convert dis to a matrix
 dist_m <- as.matrix(dis)
-dist_m
 
-dis
+# Create a dendrogram and plot it
+dend <- dist_m %>%  scale %>% 
+        dist %>% hclust %>% as.dendrogram
+
+ggd1 <- as.ggdend(dend %>% 
+                    set("labels", c(" dallas TX", " atlant GA", " allen PA", " bridge CT", " boston MA",
+                                    " clevel OH", " akron OH"," colomb OH", " albany NY", " canton OH", 
+                                    " bufalo NY", " cinnci OH", " birmhm AL", " chatag TN", " baltim MD", " chicag IL")) %>% 
+                    set("labels_cex", .8)
+                  ) 
+
+ggplot(ggd1, 
+       horiz = TRUE, 
+       theme =  theme_minimal()) +
+  labs(title = "Distance matrix, visualized",
+       subtitle = "shows Columbus and Akron OH are closest, while Chicago and Dallas furthest apart",
+       x = "",
+       y = "scaled Euclidian distance")
 ```
-
 
 ###(c) Display a plot that will help assess whether this data set comes from a multivariate normal distribution. What is your conclusion based on the plot?
 ```{r}
