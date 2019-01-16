@@ -81,9 +81,6 @@ dis.matrix
 
 ##Describe some of the most similar pairs of cities and some of the most different pairs of cities, giving evidence from the distance matrix.
 ```{r}
-library(RVAideMemoire)
-mqqnorm(as.matrix(airpol.data.sub))
-
 dist_m <- as.matrix(dis)
 dist_m
 
@@ -114,5 +111,9 @@ chisplot <- function(x) {
   }
 
 chisplot(as.matrix(airpol.data.num.sub))
+
+#better, and without the need of the chisplot function:
+library(RVAideMemoire)
+mqqnorm(as.matrix(airpol.data.num.sub))
 ```
 
