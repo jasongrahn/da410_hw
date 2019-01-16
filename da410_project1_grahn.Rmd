@@ -94,14 +94,15 @@ ggd1 <- as.ggdend(dend %>%
                     set("labels", c(" dallas TX", " atlant GA", " allen PA", " bridge CT", " boston MA",
                                     " clevel OH", " akron OH"," colomb OH", " albany NY", " canton OH", 
                                     " bufalo NY", " cinnci OH", " birmhm AL", " chatag TN", " baltim MD", " chicag IL")) %>% 
-                    set("labels_cex", .8)
+                    set("labels_cex", .6)
                   ) 
 
 ggplot(ggd1, 
        horiz = TRUE, 
        theme =  theme_minimal()) +
   labs(title = "Distance matrix, visualized",
-       subtitle = "shows Columbus and Akron OH are closest, while Chicago and Dallas furthest apart",
+       subtitle = "shows Columbus and Akron OH are closest, 
+       while Chicago and Dallas furthest apart",
        x = "",
        y = "scaled Euclidian distance")
 ```
