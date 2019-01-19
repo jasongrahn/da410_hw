@@ -93,7 +93,8 @@ dend <- dist_m %>%  scale %>%
 ggd1 <- as.ggdend(dend %>% 
                     set("labels", c(" dallas TX", " atlant GA", " allen PA", " bridge CT", " boston MA",
                                     " clevel OH", " akron OH"," colomb OH", " albany NY", " canton OH", 
-                                    " bufalo NY", " cinnci OH", " birmhm AL", " chatag TN", " baltim MD", " chicag IL")) %>% 
+                                    " bufalo NY", " cinnci OH", " birmhm AL", " chatag TN", " baltim MD", 
+                                    " chicag IL")) %>% 
                     set("labels_cex", .6)
                   ) 
 
