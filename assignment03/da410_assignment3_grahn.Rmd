@@ -31,18 +31,6 @@ Compare the three methods using all four MANOVA tests.
 #Lawley-Hotelling Test:
 ```
 
-###(b) 
-Compute the following measures of multivariate association from Section 6.1.8 : $\eta^{2}_\Lambda$, $\eta^{2}_\theta$, $A_\Lambda$, $A_(LH)$, $A_p$
-```{r}
-
-```
-
-###(c)
-Based on the eigenvalues, is the essential dimensionality of the space containing the mean vectors equal to 1 or 2?
-```{r}
-
-```
-
 
 ##6.28 
 Table 6.18 from Keuls et al. (1984) gives data from a two-way (fixed-effects) MANOVA on snap beans showing the results of four variables: $y_{1}$ = yield earliness, $y_{2}$ = specific leaf area (SLA) earliness, $y_{3}$ = total yield, and $y_{4}$ = average SLA. The factors are sowing date (S) and variety (V).
