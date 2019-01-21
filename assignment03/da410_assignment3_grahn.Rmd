@@ -1,0 +1,39 @@
+---
+title: "Untitled"
+author: "Jason Grahn"
+date: "1/20/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Homework 3 
+##6.27 
+Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three methods. Twelve fish were cooked by each method, and several judges tasted fish samples and rated each on four variables: $y_{1}$  — aroma, $y_{2}$ = flavor, $y_{3}$ = texture, and $y_{4}$ — moisture. The data are in Table 6.17. Each entry is an average score for the judges on that fish. 
+
+###(a)
+```{r}
+
+```
+
+###(b)
+```{r}
+
+```
+
+###(c)
+```{r}
+
+```
+
+
+##6.28 
+
+###(a)
+```{r}
+
+```
+
