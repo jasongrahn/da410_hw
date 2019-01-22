@@ -7,13 +7,23 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 #Homework 3 
 ##6.27 
 Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three methods. Twelve fish were cooked by each method, and several judges tasted fish samples and rated each on four variables: $y_{1}$  — aroma, $y_{2}$ = flavor, $y_{3}$ = texture, and $y_{4}$ — moisture. The data are in Table 6.17. Each entry is an average score for the judges on that fish. 
-```{r build matrix for 6.27}
 
+```{r build matrix for 6.27}
+fish <- 
+  as.tibble(
+    readr::read_table2(file = here::here("/assignment03/T6_17_FISH.DAT"),
+                   col_names = FALSE) %>% 
+  select(X1:X5) %>% 
+  mutate(X1 = as.factor(X1))
+  )
+
+head(fish,10)
 ```
 
 ###(a) 
@@ -26,9 +36,13 @@ Compare the three methods using all four MANOVA tests.
 
 
 #Pillai Test:
+manova()
 
+fish %>% 
+  broom::tidy(test = "Pillai")
 
 #Lawley-Hotelling Test:
+
 ```
 
 
