@@ -29,6 +29,19 @@ head(fish,10)
 ###(a) 
 Compare the three methods using all four MANOVA tests.
 ```{r}
+fish <- read.table("~/Bellevue College/Winter 2019/DA 410/T6_17_FISH.DAT", quote="\"", comment.char="")
+View(T6_17_FISH)
+names(T6_17_FISH)
+
+ManovaData <- manova(cbind(V2 ,V3, V4,V5) ~ V1,data=T6_17_FISH)
+summary(ManovaData)
+summary(ManovaData,test = "Pillai")
+summary(ManovaData,test = "Wilks")
+summary(ManovaData,test = "Hotelling-Lawley")
+summary(ManovaData,test = "Roy")
+
+summary.aov(ManovaData)
+
 #Wilks’ Test:
 
  
