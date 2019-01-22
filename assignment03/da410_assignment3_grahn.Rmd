@@ -16,35 +16,51 @@ Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three
 
 ```{r build matrix for 6.27}
 fish <- 
-  as.tibble(
     readr::read_table2(file = here::here("/assignment03/T6_17_FISH.DAT"),
                    col_names = FALSE) %>% 
-  select(X1:X5) %>% 
-  mutate(X1 = as.factor(X1))
-  )
+  select(X1:X5)
+
+
 
 head(fish,10)
+#names(fish)
 ```
 
 ###(a) 
 Compare the three methods using all four MANOVA tests.
 ```{r}
-#Wilks’ Test:
+#T6_17_FISH <- read.table(here::here("da410_hw/assignment3/T6_17_FISH.DAT"), quote="\"", comment.char="")
+#View(T6_17_FISH)
+#names(T6_17_FISH)
+manova.data <- manova(cbind(X2 ,X3, X4, X5) ~ X1,
+                     data=fish)
 
- 
-#Roy’s Test:
-
-
-#Pillai Test:
-manova()
-
-fish %>% 
-  broom::tidy(test = "Pillai")
-
-#Lawley-Hotelling Test:
-
+summary(manova.data)
 ```
 
+## Wilks' test
+```{r}
+summary(manova.data, test = "Wilks")
+```
+
+## Pillai test
+```{r}
+summary(manova.data, test = "Pillai")
+```
+
+## Roy test
+```{r}
+summary(manova.data, test = "Roy")
+```
+
+## Lawley-Hotelling test:
+```{r}
+summary(manova.data, test = "Hotelling-Lawley")
+```
+
+```{r}
+summary.aov(manova.data)
+```
 
 ##6.28 
 Table 6.18 from Keuls et al. (1984) gives data from a two-way (fixed-effects) MANOVA on snap beans showing the results of four variables: $y_{1}$ = yield earliness, $y_{2}$ = specific leaf area (SLA) earliness, $y_{3}$ = total yield, and $y_{4}$ = average SLA. The factors are sowing date (S) and variety (V).
