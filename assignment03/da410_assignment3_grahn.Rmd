@@ -68,16 +68,23 @@ snapbeans <-
   readr::read_table2(file = here::here("/assignment03/T6_18_SNAPBEAN.DAT"),
                    col_names = FALSE) %>% 
   select(X1:X7) %>% 
-  mutate(X1 = factor(X1),
-         X2 = factor(X2),
-         X3 = factor(X3))
+  rename(S = X1,
+         V = X2,
+         pl = X3,
+         y1 = X4,
+         y2 = X5,
+         y3 = X6,
+         y4 = X7) %>% 
+  mutate(S = factor(S),
+         V = factor(V),
+         pl = factor(pl))
 
 head(snapbeans, 5)
 ```
 
 
 ```{r}
-manova.beans <- manova(cbind(X2 ,X3, X4, X5) ~ X1*X2,
+manova.beans <- manova(cbind(y1 ,y2, y3, y4) ~ S * V,
                        data=snapbeans)
 
 manova.beans
@@ -86,17 +93,27 @@ manova.beans
 
 ###(a)
 Test for main effects and interaction using all four MANOVA statistics.
+
+##Wilks’ Test
 ```{r}
-#Wilks’ Test:
 lambda.beans <- summary(manova.beans, test = "Wilks")
 lambda.beans
- 
-#Roy’s Test:
-
-
-#Pillai Test:
-
-
-#Lawley-Hotelling Test:
 ```
 
+## Pillai test
+```{r}
+pillai <- summary(manova.beans, test = "Pillai")
+pillai
+```
+
+## Roy test
+```{r}
+roy <- summary(manova.beans, test = "Roy")
+roy
+```
+
+## Hotelling-Lawley test:
+```{r}
+hotelling <- summary(manova.beans, test = "Hotelling-Lawley")
+hotelling
+```
