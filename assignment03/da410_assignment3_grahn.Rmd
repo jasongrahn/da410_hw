@@ -95,6 +95,7 @@ manova.beans
 Test for main effects and interaction using all four MANOVA statistics.
 
 ##Wilks’ Test
+(this is a kind of test to measure if means are equal)
 ```{r}
 lambda.beans <- summary(manova.beans, test = "Wilks")
 lambda.beans
