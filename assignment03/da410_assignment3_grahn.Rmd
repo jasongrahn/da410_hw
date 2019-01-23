@@ -18,9 +18,8 @@ Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three
 fish <- 
     readr::read_table2(file = here::here("/assignment03/T6_17_FISH.DAT"),
                    col_names = FALSE) %>% 
-  select(X1:X5)
-
-
+  select(X1:X5) %>% 
+  mutate(X1 = factor(X1))
 
 head(fish,10)
 #names(fish)
@@ -29,32 +28,32 @@ head(fish,10)
 ###(a) 
 Compare the three methods using all four MANOVA tests.
 ```{r}
-manova.data <- manova(cbind(X2 ,X3, X4, X5) ~ factor(X1),
+manova.data <- manova(cbind(X2 ,X3, X4, X5) ~ X1,
                      data=fish)
-
-summary(manova.data)
 ```
 
 ## Wilks' test
 ```{r}
-summary(manova.data, test = "Wilks")
+lambda <- summary(manova.data, test = "Wilks")
+lambda
 ```
 
 ## Pillai test
 ```{r}
-summary(manova.data, test = "Pillai")
+pillai <- summary(manova.data, test = "Pillai")
+pillai
 ```
 
 ## Roy test
 ```{r}
-summary(manova.data, test = "Roy")
-
-(2.9515)/(1+(2.9515))
+roy <- summary(manova.data, test = "Roy")
+roy
 ```
 
-## Lawley-Hotelling test:
+## Hotelling-Lawley test:
 ```{r}
-summary(manova.data, test = "Hotelling-Lawley")
+hotelling <- summary(manova.data, test = "Hotelling-Lawley")
+hotelling
 ```
 
 ```{r}
@@ -65,14 +64,32 @@ summary.aov(manova.data)
 Table 6.18 from Keuls et al. (1984) gives data from a two-way (fixed-effects) MANOVA on snap beans showing the results of four variables: $y_{1}$ = yield earliness, $y_{2}$ = specific leaf area (SLA) earliness, $y_{3}$ = total yield, and $y_{4}$ = average SLA. The factors are sowing date (S) and variety (V).
 
 ```{r build matrix for 6.28}
+snapbeans <- 
+  readr::read_table2(file = here::here("/assignment03/T6_18_SNAPBEAN.DAT"),
+                   col_names = FALSE) %>% 
+  select(X1:X7) %>% 
+  mutate(X1 = factor(X1),
+         X2 = factor(X2),
+         X3 = factor(X3))
 
+head(snapbeans, 5)
 ```
+
+
+```{r}
+manova.beans <- manova(cbind(X2 ,X3, X4, X5) ~ X1*X2,
+                       data=snapbeans)
+
+manova.beans
+```
+
 
 ###(a)
 Test for main effects and interaction using all four MANOVA statistics.
 ```{r}
 #Wilks’ Test:
-
+lambda.beans <- summary(manova.beans, test = "Wilks")
+lambda.beans
  
 #Roy’s Test:
 
