@@ -1,0 +1,36 @@
+---
+title: "da410_project2"
+author: "Jason Grahn"
+date: "1/23/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Part 1: 
+Download testscoredata.txt and read it in R
+```{r import data}
+scores <- 
+  readr::read_table2(file = here::here("/project2/testscoredata.txt"),
+                   col_names = TRUE) %>% 
+  mutate(subject = factor(subject),
+         sex = factor(sex))
+
+head(scores,5)
+```
+
+Use Hotelling’s T^2 test to test for a difference in the mean score vector of the boys and the mean vector of the girls. Make sure you include clear command lines and relevant output/results with hypotheses, test result(s) and conclusion(s)/interpretation(s).
+```{r}
+
+```
+
+
+#Part 2: 
+Suppose we have gathered the following data on female athletes in three sports. The measurements we have made are the athletes' heights and vertical jumps, both in inches. The data are listed as (height, jump) as follows:
+
+Basketball Players: (66, 27), (65, 29), (68, 26), (64, 29), (67, 29)
+Track Athletes: (63, 23), (61, 26), (62, 23), (60, 26)
+Softball Players: (62, 23), (65, 21), (63, 21), (62, 23), (63.5, 22), (66, 21.5)
+
