@@ -150,3 +150,31 @@ beans.hotel
 ```
 
 And finally, we reject $H_0$ with Hotelling-Lawley test. 
+
+#Let's try this with tidy? 
+https://rdrr.io/github/tidyverse/broom/man/tidy.manova.html is a resource
+
+```{r}
+#need to figure out something to put in stats::manova()
+bean.manova <- stats::manova(cbind(y1, y2, y3, y4) ~ S*V, snapbeans)
+
+#then can wrap it in tidy() from the "broom" package
+roys.tidy.beans <- broom::tidy(bean.manova, 
+                              test = "Roy",
+                              intercept = FALSE)
+
+roys.tidy.beans
+
+#but why, Jason? 
+#because I don't like doing math! So I have R do it for me. 
+
+roys.tidy.beans %>%  #use that tidy tibble
+  filter(term != "Residuals") %>%  #filter out residuals because I dont need them
+  select(term, roy) %>% #keep the columns I want
+  mutate(roys_theta = round((roy / (1 + roy)), 3)) #make roy's theta
+
+#Done!
+```
+
+
+
