@@ -1,18 +1,19 @@
 ---
-title: "Untitled"
+title: "DA410 Assignment 3"
 author: "Jason Grahn"
 date: "1/20/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
+library(tidyverse) #for piping, mutates, and selects
 ```
 
 #Homework 3 
+
 ##6.27 
-Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three methods. Twelve fish were cooked by each method, and several judges tasted fish samples and rated each on four variables: $y_{1}$  — aroma, $y_{2}$ = flavor, $y_{3}$ = texture, and $y_{4}$ — moisture. The data are in Table 6.17. Each entry is an average score for the judges on that fish. 
+Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three methods. Twelve fish were cooked by each method, and several judges tasted fish samples and rated each on four variables: $y_{1}$ = aroma, $y_{2}$ = flavor, $y_{3}$ = texture, and $y_{4}$ = moisture. The data are in Table 6.17. Each entry is an average score for the judges on that fish. 
 
 ```{r build matrix for 6.27}
 fish <- 
@@ -22,42 +23,53 @@ fish <-
   mutate(X1 = factor(X1))
 
 head(fish,10)
-#names(fish)
 ```
 
 ###(a) 
 Compare the three methods using all four MANOVA tests.
-```{r}
+```{r build the manova}
 manova.data <- manova(cbind(X2 ,X3, X4, X5) ~ X1,
                      data=fish)
-manova.data
+
+broom::tidy(manova.data)
 ```
 
-## Wilks' test
-```{r}
-lambda <- summary(manova.data, test = "Wilks")
-lambda
+#### Wilks' test
+```{r wilks fish}
+fish.lambda <- summary(manova.data, test = "Wilks")
+fish.lambda
 ```
 
-## Pillai test
-```{r}
-pillai <- summary(manova.data, test = "Pillai")
-pillai
+Wilks' $\Lambda$ is low, so we can reject $H_0$.
+
+#### Pillai test
+```{r pillai fish}
+fish.pillai <- summary(manova.data, test = "Pillai")
+fish.pillai
 ```
 
-## Roy test
-```{r}
-roy <- summary(manova.data, test = "Roy")
-roy
+Pillai test is low, so we can reject $H_0$.
+
+#### Roy test
+```{r roy fish}
+fish.roy <- summary(manova.data, test = "Roy")
+fish.roy 
+
+#roy value is 137.168, which we convert...
+2.9515/(1+2.9515)
 ```
 
-## Hotelling-Lawley test:
-```{r}
-hotelling <- summary(manova.data, test = "Hotelling-Lawley")
-hotelling
+We can reject $H_0$ for Roy as well.
+
+#### Hotelling-Lawley test:
+```{r hotel fish}
+fish.hotel <- summary(manova.data, test = "Hotelling-Lawley")
+fish.hotel
 ```
 
-```{r}
+$H_0$ for Hotelling-Lawley test is also low, so that can be rejected.
+
+```{r fish aov summary}
 summary.aov(manova.data)
 ```
 
@@ -84,7 +96,7 @@ head(snapbeans, 5)
 ```
 
 
-```{r}
+```{r build beans manova }
 manova.beans <- manova(cbind(y1 ,y2, y3, y4) ~ S * V,
                        data=snapbeans)
 
@@ -95,27 +107,46 @@ manova.beans
 ###(a)
 Test for main effects and interaction using all four MANOVA statistics.
 
-##Wilks’ Test
+####Wilks’ Test
 (this is a kind of test to measure if means are equal)
-```{r}
-lambda.beans <- summary(manova.beans, test = "Wilks")
-lambda.beans
+```{r beans wilks}
+beans.lambda <- summary(manova.beans, test = "Wilks")
+beans.lambda
 ```
 
-## Pillai test
-```{r}
-pillai <- summary(manova.beans, test = "Pillai")
-pillai
+Wilks $\Lambda$ for S is low, reject $H_0$.
+Wilks $\Lambda$ for V is low, reject $H_0$.
+Wilks $\Lambda$ for the S*V interaction is low, reject $H_0$.
+
+
+#### Pillai test
+```{r beans pillai}
+beans.pillai <- summary(manova.beans, test = "Pillai")
+beans.pillai
 ```
 
-## Roy test
-```{r}
-roy <- summary(manova.beans, test = "Roy")
-roy
+$H_0$ is rejected in Pillai's test as well. 
+
+#### Roy test
+```{r beans roy}
+beans.roy <- summary(manova.beans, test = "Roy")
+
+#roy values are 137.168, 11.445, and 2.649
+S <- 137.168/(1+137.168)
+V <- 11.445/(1+11.445)
+SV <- 2.649/(1+2.649)
+
+S
+V
+SV
 ```
 
-## Hotelling-Lawley test:
-```{r}
-hotelling <- summary(manova.beans, test = "Hotelling-Lawley")
-hotelling
+$H_0$ is rejected with Roy's test.
+
+#### Hotelling-Lawley test:
+```{r beans hotel}
+beans.hotel <- summary(manova.beans, test = "Hotelling-Lawley")
+beans.hotel
 ```
+
+And finally, we reject $H_0$ with Hotelling-Lawley test. 

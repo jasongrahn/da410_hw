@@ -1,4 +1,4 @@
-Untitled
+DA410 Assignment 3
 ================
 Jason Grahn
 1/20/2019
@@ -9,7 +9,7 @@ Homework 3
 6.27
 ----
 
-Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three methods. Twelve fish were cooked by each method, and several judges tasted fish samples and rated each on four variables: *y*<sub>1</sub> — aroma, *y*<sub>2</sub> = flavor, *y*<sub>3</sub> = texture, and *y*<sub>4</sub> — moisture. The data are in Table 6.17. Each entry is an average score for the judges on that fish.
+Baten, Tack, and Baeder (1958) compared judges' scores on fish prepared by three methods. Twelve fish were cooked by each method, and several judges tasted fish samples and rated each on four variables: *y*<sub>1</sub> = aroma, *y*<sub>2</sub> = flavor, *y*<sub>3</sub> = texture, and *y*<sub>4</sub> = moisture. The data are in Table 6.17. Each entry is an average score for the judges on that fish.
 
 ``` r
 fish <- 
@@ -47,10 +47,6 @@ head(fish,10)
     ##  9 1       5.7   5.4   4.9   5  
     ## 10 1       5.6   5.2   5.4   5.8
 
-``` r
-#names(fish)
-```
-
 ### (a)
 
 Compare the three methods using all four MANOVA tests.
@@ -58,29 +54,21 @@ Compare the three methods using all four MANOVA tests.
 ``` r
 manova.data <- manova(cbind(X2 ,X3, X4, X5) ~ X1,
                      data=fish)
-manova.data
+
+broom::tidy(manova.data)
 ```
 
-    ## Call:
-    ##    manova(cbind(X2, X3, X4, X5) ~ X1, data = fish)
-    ## 
-    ## Terms:
-    ##                        X1 Residuals
-    ## resp 1           1.050556 13.408333
-    ## resp 2               4.88      8.48
-    ## resp 3           2.382222 11.607500
-    ## resp 4           0.810556 10.565833
-    ## Deg. of Freedom         2        33
-    ## 
-    ## Residual standard errors: 0.637427 0.5069218 0.5930788 0.5658416
-    ## Estimated effects may be unbalanced
+    ## # A tibble: 2 x 7
+    ##   term         df pillai statistic num.df den.df    p.value
+    ##   <chr>     <dbl>  <dbl>     <dbl>  <dbl>  <dbl>      <dbl>
+    ## 1 X1            2  0.860      5.84      8     62  0.0000146
+    ## 2 Residuals    33 NA         NA        NA     NA NA
 
-Wilks' test
------------
+#### Wilks' test
 
 ``` r
-lambda <- summary(manova.data, test = "Wilks")
-lambda
+fish.lambda <- summary(manova.data, test = "Wilks")
+fish.lambda
 ```
 
     ##           Df   Wilks approx F num Df den Df    Pr(>F)    
@@ -89,12 +77,13 @@ lambda
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Pillai test
------------
+Wilks' *Λ* is low, so we can reject *H*<sub>0</sub>.
+
+#### Pillai test
 
 ``` r
-pillai <- summary(manova.data, test = "Pillai")
-pillai
+fish.pillai <- summary(manova.data, test = "Pillai")
+fish.pillai
 ```
 
     ##           Df  Pillai approx F num Df den Df    Pr(>F)    
@@ -103,12 +92,13 @@ pillai
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Roy test
---------
+Pillai test is low, so we can reject *H*<sub>0</sub>.
+
+#### Roy test
 
 ``` r
-roy <- summary(manova.data, test = "Roy")
-roy
+fish.roy <- summary(manova.data, test = "Roy")
+fish.roy 
 ```
 
     ##           Df    Roy approx F num Df den Df    Pr(>F)    
@@ -117,12 +107,20 @@ roy
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Hotelling-Lawley test:
-----------------------
+``` r
+#roy value is 137.168, which we convert...
+2.9515/(1+2.9515)
+```
+
+    ## [1] 0.7469315
+
+We can reject *H*<sub>0</sub> for Roy as well.
+
+#### Hotelling-Lawley test:
 
 ``` r
-hotelling <- summary(manova.data, test = "Hotelling-Lawley")
-hotelling
+fish.hotel <- summary(manova.data, test = "Hotelling-Lawley")
+fish.hotel
 ```
 
     ##           Df Hotelling-Lawley approx F num Df den Df    Pr(>F)    
@@ -130,6 +128,8 @@ hotelling
     ## Residuals 33                                                      
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+*H*<sub>0</sub> for Hotelling-Lawley test is also low, so that can be rejected.
 
 ``` r
 summary.aov(manova.data)
@@ -231,14 +231,13 @@ manova.beans
 
 Test for main effects and interaction using all four MANOVA statistics.
 
-Wilks’ Test
------------
+#### Wilks’ Test
 
 (this is a kind of test to measure if means are equal)
 
 ``` r
-lambda.beans <- summary(manova.beans, test = "Wilks")
-lambda.beans
+beans.lambda <- summary(manova.beans, test = "Wilks")
+beans.lambda
 ```
 
     ##           Df    Wilks approx F num Df den Df    Pr(>F)    
@@ -249,12 +248,13 @@ lambda.beans
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Pillai test
------------
+Wilks *Λ* for S is low, reject *H*<sub>0</sub>. Wilks *Λ* for V is low, reject *H*<sub>0</sub>. Wilks *Λ* for the S\*V interaction is low, reject *H*<sub>0</sub>.
+
+#### Pillai test
 
 ``` r
-pillai <- summary(manova.beans, test = "Pillai")
-pillai
+beans.pillai <- summary(manova.beans, test = "Pillai")
+beans.pillai
 ```
 
     ##           Df Pillai approx F num Df den Df    Pr(>F)    
@@ -265,28 +265,42 @@ pillai
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Roy test
---------
+*H*<sub>0</sub> is rejected in Pillai's test as well.
+
+#### Roy test
 
 ``` r
-roy <- summary(manova.beans, test = "Roy")
-roy
+beans.roy <- summary(manova.beans, test = "Roy")
+
+#roy values are 137.168, 11.445, and 2.649
+S <- 137.168/(1+137.168)
+V <- 11.445/(1+11.445)
+SV <- 2.649/(1+2.649)
+
+S
 ```
 
-    ##           Df     Roy approx F num Df den Df    Pr(>F)    
-    ## S          3 137.168  1611.72      4     47 < 2.2e-16 ***
-    ## V          2  11.445   131.61      4     46 < 2.2e-16 ***
-    ## S:V        6   2.649    21.19      6     48 5.691e-12 ***
-    ## Residuals 48                                             
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Hotelling-Lawley test:
-----------------------
+    ## [1] 0.9927624
 
 ``` r
-hotelling <- summary(manova.beans, test = "Hotelling-Lawley")
-hotelling
+V
+```
+
+    ## [1] 0.9196464
+
+``` r
+SV
+```
+
+    ## [1] 0.7259523
+
+*H*<sub>0</sub> is rejected with Roy's test.
+
+#### Hotelling-Lawley test:
+
+``` r
+beans.hotel <- summary(manova.beans, test = "Hotelling-Lawley")
+beans.hotel
 ```
 
     ##           Df Hotelling-Lawley approx F num Df den Df    Pr(>F)    
@@ -296,3 +310,5 @@ hotelling
     ## Residuals 48                                                      
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+And finally, we reject *H*<sub>0</sub> with Hotelling-Lawley test.
