@@ -240,6 +240,77 @@ Histograms for either variable indicate we may not have normal distributions. Id
 
 We assume independence as we do not have evidence of the sampling methodology.
 
+``` r
+#checking for covariance
+sports.S <- sports %>% 
+  select(height, jump) %>% 
+  var()
+
+#Covariance across all data
+round(sports.S,3)
+```
+
+    ##        height  jump
+    ## height  5.274 1.756
+    ## jump    1.756 8.731
+
+``` r
+#covariance within each 
+by(sports %>% select(height, jump), sport, var)
+```
+
+    ## sport: B
+    ##        height jump
+    ## height    2.5 -1.5
+    ## jump     -1.5  2.0
+    ## -------------------------------------------------------- 
+    ## sport: S
+    ##           height       jump
+    ## height  2.641667 -1.0416667
+    ## jump   -1.041667  0.8416667
+    ## -------------------------------------------------------- 
+    ## sport: T
+    ##           height jump
+    ## height  1.666667   -2
+    ## jump   -2.000000    3
+
+The data shows little covariance across the entire data as well as within each sport group.
+
+``` r
+#checking for correlation 
+sports.R <- sports %>% 
+  select(height, jump) %>% 
+  cor()
+
+#correlation across all data
+round(sports.R,3)
+```
+
+    ##        height  jump
+    ## height  1.000 0.259
+    ## jump    0.259 1.000
+
+``` r
+by(sports %>% select(height, jump), sport, cor)
+```
+
+    ## sport: B
+    ##            height       jump
+    ## height  1.0000000 -0.6708204
+    ## jump   -0.6708204  1.0000000
+    ## -------------------------------------------------------- 
+    ## sport: S
+    ##            height       jump
+    ## height  1.0000000 -0.6985857
+    ## jump   -0.6985857  1.0000000
+    ## -------------------------------------------------------- 
+    ## sport: T
+    ##            height       jump
+    ## height  1.0000000 -0.8944272
+    ## jump   -0.8944272  1.0000000
+
+The data shows little correlation across the entire data, though we do see strong relationships within each sport group; specifically within "T" (Track).
+
 C
 -
 
@@ -283,7 +354,7 @@ jump_box <- sports %>%
 cowplot::plot_grid(height_box,jump_box)
 ```
 
-![](da410_project2_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](da410_project2_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 Plotting the sample mean for each measurement on top of boxplots, we clearly see the distributions for each sport in each variable do not overlap. This reinforces the hypothesis test showing rejection of *H*<sub>0</sub>.
 

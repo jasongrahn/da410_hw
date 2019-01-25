@@ -2,7 +2,7 @@
 title: "da410_project2"
 author: "Jason Grahn"
 date: "1/23/2019"
-output: word_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -161,6 +161,35 @@ tidy.sports %>%
 Histograms for either variable indicate we may not have normal distributions. Ideally we would have more samples in order to conduct a thorough analysis.
 
 We assume independence as we do not have evidence of the sampling methodology. 
+
+```{r}
+#checking for covariance
+sports.S <- sports %>% 
+  select(height, jump) %>% 
+  var()
+
+#Covariance across all data
+round(sports.S,3)
+
+#covariance within each 
+by(sports %>% select(height, jump), sport, var)
+```
+
+The data shows little covariance across the entire data as well as within each sport group.
+
+```{r}
+#checking for correlation 
+sports.R <- sports %>% 
+  select(height, jump) %>% 
+  cor()
+
+#correlation across all data
+round(sports.R,3)
+
+by(sports %>% select(height, jump), sport, cor)
+```
+
+The data shows little correlation across the entire data, though we do see strong relationships within each sport group; specifically within "T" (Track).
 
 ## C
 
