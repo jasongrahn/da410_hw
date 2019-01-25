@@ -119,12 +119,12 @@ Suppose we have gathered the following data on female athletes in three sports. 
     Track Athletes:     (63, 23), (61, 26), (62, 23), (60, 26)
     Softball Players:   (62, 23), (65, 21), (63, 21), (62, 23), (63.5, 22), (66, 21.5)
 
--   Use R to conduct the MANOVA F-test using Wilks' Lambda to test for a difference in (height, jump) mean vectors across the three sports. Make sure you include clear command lines and relevant output/results with hypotheses, test result(s) and conclusion(s)/interpretation(s)
--   State the assumptions of your test and check to see whether assumptions are met. Do you believe your inference is valid? Why or why not?
--   Use R to examine the sample mean vectors for each group. Make sure you include clear command lines and relevant output/results. Also comment on the differences among the groups in terms of the specific variables.
+A
+-
 
-The data
---------
+Use R to conduct the MANOVA F-test using Wilks' Lambda to test for a difference in (height, jump) mean vectors across the three sports. Make sure you include clear command lines and relevant output/results with hypotheses, test result(s) and conclusion(s)/interpretation(s)
+
+### The data
 
 Download testscoredata.txt and read it in R
 
@@ -135,18 +135,27 @@ height <- c(66,65,68,64,67,63,61,62,60,62,65,63,62,63.5,66)
 jump   <- c(27,29,26,29,29,23,26,23,26,23,21,21,23,22,21.5)
 
 #make a table
-sports <- tibble(sport, height, jump)
+sports <- tibble(sport, height, jump) %>% 
+  #and give the sports friendly names
+  mutate(sport = case_when(sport == "B" ~ "Basketball",
+                           sport == "T" ~ "Track",
+                           sport == "S" ~ "Softball"))
 head(sports, 5)
 ```
 
     ## # A tibble: 5 x 3
-    ##   sport height  jump
-    ##   <fct>  <dbl> <dbl>
-    ## 1 B         66    27
-    ## 2 B         65    29
-    ## 3 B         68    26
-    ## 4 B         64    29
-    ## 5 B         67    29
+    ##   sport      height  jump
+    ##   <chr>       <dbl> <dbl>
+    ## 1 Basketball     66    27
+    ## 2 Basketball     65    29
+    ## 3 Basketball     68    26
+    ## 4 Basketball     64    29
+    ## 5 Basketball     67    29
+
+``` r
+#making a tidy table for later use
+tidy.sports <- sports %>% gather(key = var_name, value = measurement, -sport)
+```
 
 The hypothesis
 --------------
@@ -172,10 +181,7 @@ sports.manova
     ## Residual standard errors: 1.533197 1.329421
     ## Estimated effects may be unbalanced
 
-Initial impression is that we have a very obvious difference in means between responses.
-
-The test
---------
+### The test
 
 ``` r
 tidy.sports.wilks <- broom::tidy(sports.manova, 
@@ -183,8 +189,7 @@ tidy.sports.wilks <- broom::tidy(sports.manova,
                               intercept = FALSE)
 ```
 
-The result:
------------
+### The result:
 
 ``` r
 tidy.sports.wilks
@@ -198,16 +203,97 @@ tidy.sports.wilks
 
 Wilks' *Λ* score 0.036.
 
-The conclusion
---------------
+### The conclusion
 
-With a *p* − *v**a**l**u**e* of 1.116880510^{-7}, we can safely reject *H*<sub>0</sub> and conclude that the mean vectors aross the sports not equal.
+With a *p* − *v**a**l**u**e* of 1.116880510^{-7}, we can safely reject *H*<sub>0</sub> and conclude that the mean vectors aross the sports are not equal.
 
-Do some normality tests
+B
+-
 
-do some boxplots showing comparisions
+### The assumptions
+
+State the assumptions of your test and check to see whether assumptions are met. Do you believe your inference is valid? Why or why not?
 
 ``` r
-library(RVAideMemoire)
-#mqqnorm(as.matrix(airpol.data.num.sub))
+#one way to check for nomalicy is the qqplot. We'll use RVAideMemoire::mqqnorm for this
+RVAideMemoire::mqqnorm(sports %>% select(height, jump))
 ```
+
+![](da410_project2_files/figure-markdown_github/unnamed-chunk-2-1.png)
+
+    ## [1] 9 6
+
+``` r
+tidy.sports %>% 
+  ggplot(aes(x = measurement)) +
+  geom_histogram(aes(fill = var_name)) +
+  facet_grid(var_name ~ .) +
+  theme_bw() +
+  theme(legend.position="bottom")
+```
+
+![](da410_project2_files/figure-markdown_github/unnamed-chunk-2-2.png)
+
+While the displayed confidence interval is quite spread, we see most values do reside near the line and can conclude normalicy.
+
+C
+-
+
+Use R to examine the sample mean vectors for each group. Make sure you include clear command lines and relevant output/results. Also comment on the differences among the groups in terms of the specific variables.
+
+``` r
+# Sample mean vectors for the sports data
+xbar.sat <- apply(sports %>% select(height, jump), 2, mean)
+xbar.sat
+```
+
+    ##   height     jump 
+    ## 63.83333 24.63333
+
+``` r
+# do some boxplots showing mean distributions
+height_box <- sports %>% 
+  ggplot(aes(x = sport, y = height, fill = sport)) +
+  geom_boxplot() +
+  geom_hline(yintercept = xbar.sat[[1]], color = "dark grey") +
+  theme_bw() +
+  theme(legend.position="none") +
+  labs(title = "Height",
+       subtitle = "Mean value of 63.83",
+       y = "",
+       x = "",
+       caption = " ")
+
+jump_box <- sports %>% 
+  ggplot(aes(x = sport, y = jump, fill = sport)) +
+  geom_boxplot() +
+  geom_hline(yintercept = xbar.sat[[2]], color = "dark grey") +
+  theme_bw() +
+  theme(legend.position="none") +
+  labs(title = "Jump",
+       subtitle = "Mean value of 24.63",
+       y = "",
+       x = "",
+       caption = "Light grey line represents the mean for each measurement")
+
+cowplot::plot_grid(height_box,jump_box)
+```
+
+![](da410_project2_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
+Plotting the sample mean for each measurement on top of boxplots, we clearly see the distributions for each sport in each variable do not overlap. This reinforces the hypothesis test showing rejection of *H*<sub>0</sub>.
+
+``` r
+# a quick table of means.
+sports %>% 
+  group_by(sport) %>% 
+  summarize(mean_height = round(mean(height),3),
+            mean_jump = round(mean(jump),3)) 
+```
+
+    ## # A tibble: 3 x 3
+    ##   sport      mean_height mean_jump
+    ##   <chr>            <dbl>     <dbl>
+    ## 1 Basketball        66        28  
+    ## 2 Softball          63.6      21.9
+    ## 3 Track             61.5      24.5

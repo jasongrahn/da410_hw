@@ -87,7 +87,7 @@ Suppose we have gathered the following data on female athletes in three sports. 
 
 Use R to conduct the MANOVA F-test using Wilks' Lambda to test for a difference in (height, jump) mean vectors across the three sports. Make sure you include clear command lines and relevant output/results with hypotheses, test result(s) and conclusion(s)/interpretation(s)
 
-## The data
+### The data
 
 Download testscoredata.txt and read it in R
 ```{r import matrix data}
@@ -98,10 +98,14 @@ jump   <- c(27,29,26,29,29,23,26,23,26,23,21,21,23,22,21.5)
 
 #make a table
 sports <- tibble(sport, height, jump) %>% 
+  #and give the sports friendly names
   mutate(sport = case_when(sport == "B" ~ "Basketball",
                            sport == "T" ~ "Track",
                            sport == "S" ~ "Softball"))
 head(sports, 5)
+
+#making a tidy table for later use
+tidy.sports <- sports %>% gather(key = var_name, value = measurement, -sport)
 ```
 
 ## The hypothesis
@@ -114,23 +118,23 @@ sports.manova <- stats::manova(cbind(height, jump) ~ sport, sports)
 sports.manova
 ```
 
-## The test 
+### The test 
 ```{r testing  with Wilks lambda}
 tidy.sports.wilks <- broom::tidy(sports.manova, 
                               test = "Wilks",
                               intercept = FALSE)
 ```
 
-##The result: 
+### The result: 
 ```{r show results for  Wilks lambda}
 tidy.sports.wilks
 ```
 
 Wilks' $\Lambda$ score `r round(tidy.sports.wilks$wilks[1],3)`. 
 
-## The conclusion
+### The conclusion
 
-With a $p-value$ of `r tidy.sports.wilks$p.value[1]`, we can safely reject $H_0$ and conclude that the mean vectors aross the sports not equal.
+With a $p-value$ of `r tidy.sports.wilks$p.value[1]`, we can safely reject $H_0$ and conclude that the mean vectors aross the sports are not equal.
 
 ## B 
 
@@ -145,37 +149,64 @@ RVAideMemoire::mqqnorm(sports %>% select(height, jump))
 
 While the displayed confidence interval is quite spread, we see most values do reside near the line and can conclude normalicy.
 
+```{r}
+tidy.sports %>% 
+  ggplot(aes(x = measurement)) +
+  geom_histogram(aes(fill = var_name)) +
+  facet_grid(var_name ~ .) +
+  theme_bw() +
+  theme(legend.position="bottom")
+```
 
-# C
+Histograms for either variable indicate we may not have normal distributions. Ideally we would have more samples in order to conduct a thorough analysis.
+
+We assume independence as we do not have evidence of the sampling methodology. 
+
+## C
 
 Use R to examine the sample mean vectors for each group. Make sure you include clear command lines and relevant output/results. Also comment on the differences among the groups in terms of the specific variables.
-Do some normality tests
 
 ```{r}
-#a quick table of means.
-sports %>% 
-  group_by(sport) %>% 
-  summarize(mean_height = mean(height),
-            mean_jump = mean(jump)) 
-  
-#do some boxplots showing mean distributions
+# Sample mean vectors for the sports data
+xbar.sat <- apply(sports %>% select(height, jump), 2, mean)
+xbar.sat
+```
+
+```{r}
+# do some boxplots showing mean distributions
 height_box <- sports %>% 
   ggplot(aes(x = sport, y = height, fill = sport)) +
   geom_boxplot() +
-  theme_light() +
+  geom_hline(yintercept = xbar.sat[[1]], color = "dark grey") +
+  theme_bw() +
   theme(legend.position="none") +
   labs(title = "Height",
+       subtitle = "Mean value of 63.83",
        y = "",
-       x = "")
+       x = "",
+       caption = " ")
 
 jump_box <- sports %>% 
   ggplot(aes(x = sport, y = jump, fill = sport)) +
   geom_boxplot() +
-  theme_light() +
+  geom_hline(yintercept = xbar.sat[[2]], color = "dark grey") +
+  theme_bw() +
   theme(legend.position="none") +
   labs(title = "Jump",
+       subtitle = "Mean value of 24.63",
        y = "",
-       x = "")
+       x = "",
+       caption = "Light grey line represents the mean for each measurement")
 
 cowplot::plot_grid(height_box,jump_box)
+```
+
+Plotting the sample mean for each measurement on top of boxplots, we clearly see the distributions for each sport in each variable do not overlap. This reinforces the hypothesis test showing rejection of $H_0$. 
+
+```{r}
+# a quick table of means.
+sports %>% 
+  group_by(sport) %>% 
+  summarize(mean_height = round(mean(height),3),
+            mean_jump = round(mean(jump),3)) 
 ```
