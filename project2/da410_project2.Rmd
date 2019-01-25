@@ -82,14 +82,14 @@ Suppose we have gathered the following data on female athletes in three sports. 
     Track Athletes:     (63, 23), (61, 26), (62, 23), (60, 26)
     Softball Players:   (62, 23), (65, 21), (63, 21), (62, 23), (63.5, 22), (66, 21.5)
 
- * Use R to conduct the MANOVA F-test using Wilks' Lambda to test for a difference in (height, jump) mean vectors across the three sports. Make sure you include clear command lines and relevant output/results with hypotheses, test result(s) and conclusion(s)/interpretation(s)
- * State the assumptions of your test and check to see whether assumptions are met. Do you believe your inference is valid? Why or why not?
- * Use R to examine the sample mean vectors for each group. Make sure you include clear command lines and relevant output/results. Also comment on the differences among the groups in terms of the specific variables.
+
+## A 
+
+Use R to conduct the MANOVA F-test using Wilks' Lambda to test for a difference in (height, jump) mean vectors across the three sports. Make sure you include clear command lines and relevant output/results with hypotheses, test result(s) and conclusion(s)/interpretation(s)
 
 ## The data
 
 Download testscoredata.txt and read it in R
-
 ```{r import matrix data}
 #imput data
 sport  <- as.factor(c('B','B','B','B','B','T','T','T','T','S','S','S','S','S','S'))
@@ -97,12 +97,14 @@ height <- c(66,65,68,64,67,63,61,62,60,62,65,63,62,63.5,66)
 jump   <- c(27,29,26,29,29,23,26,23,26,23,21,21,23,22,21.5)
 
 #make a table
-sports <- tibble(sport, height, jump)
+sports <- tibble(sport, height, jump) %>% 
+  mutate(sport = case_when(sport == "B" ~ "Basketball",
+                           sport == "T" ~ "Track",
+                           sport == "S" ~ "Softball"))
 head(sports, 5)
 ```
 
 ## The hypothesis
-
 > $H_0$: The mean difference between sports is equal ( $\mu_o = \mu_1$).
 
 > $H_a$: The mean difference between sports is not equal ( $\mu_o \neq \mu_1$). 
@@ -111,8 +113,6 @@ head(sports, 5)
 sports.manova <- stats::manova(cbind(height, jump) ~ sport, sports)
 sports.manova
 ```
-
-Initial impression is that we have a very obvious difference in means between responses. 
 
 ## The test 
 ```{r testing  with Wilks lambda}
@@ -132,11 +132,50 @@ Wilks' $\Lambda$ score `r round(tidy.sports.wilks$wilks[1],3)`.
 
 With a $p-value$ of `r tidy.sports.wilks$p.value[1]`, we can safely reject $H_0$ and conclude that the mean vectors aross the sports not equal.
 
-Do some normality tests
+## B 
 
-do some boxplots showing comparisions
+### The assumptions
+
+State the assumptions of your test and check to see whether assumptions are met. Do you believe your inference is valid? Why or why not?
 
 ```{r}
-library(RVAideMemoire)
-#mqqnorm(as.matrix(airpol.data.num.sub))
+#one way to check for nomalicy is the qqplot. We'll use RVAideMemoire::mqqnorm for this
+RVAideMemoire::mqqnorm(sports %>% select(height, jump))
+```
+
+While the displayed confidence interval is quite spread, we see most values do reside near the line and can conclude normalicy.
+
+
+# C
+
+Use R to examine the sample mean vectors for each group. Make sure you include clear command lines and relevant output/results. Also comment on the differences among the groups in terms of the specific variables.
+Do some normality tests
+
+```{r}
+#a quick table of means.
+sports %>% 
+  group_by(sport) %>% 
+  summarize(mean_height = mean(height),
+            mean_jump = mean(jump)) 
+  
+#do some boxplots showing mean distributions
+height_box <- sports %>% 
+  ggplot(aes(x = sport, y = height, fill = sport)) +
+  geom_boxplot() +
+  theme_light() +
+  theme(legend.position="none") +
+  labs(title = "Height",
+       y = "",
+       x = "")
+
+jump_box <- sports %>% 
+  ggplot(aes(x = sport, y = jump, fill = sport)) +
+  geom_boxplot() +
+  theme_light() +
+  theme(legend.position="none") +
+  labs(title = "Jump",
+       y = "",
+       x = "")
+
+cowplot::plot_grid(height_box,jump_box)
 ```
