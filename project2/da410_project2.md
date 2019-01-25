@@ -43,6 +43,19 @@ The hypothesis
 > *H*<sub>*a*</sub>: The mean scores between sexes is not equal ( *μ*<sub>*o*</sub> ≠ *μ*<sub>1</sub>).
 
 ``` r
+#sample covariance matrix
+scores.S <- scores %>% 
+  select(math, reading) %>% 
+  var()
+
+round(scores.S,3)
+```
+
+    ##           math reading
+    ## math    26.909  25.672
+    ## reading 25.672  27.335
+
+``` r
 #build the manova binding
 scores.manova <- stats::manova(cbind(math, reading) ~ sex, scores)
 scores.manova
@@ -59,8 +72,6 @@ scores.manova
     ## 
     ## Residual standard errors: 5.198502 5.265737
     ## Estimated effects may be unbalanced
-
-We see that *resp 1* has a mean value of 19.976, while *resp 2* has a mean value of 3.768. Our initial impression is that the mean values are not equal.
 
 The test
 --------
@@ -88,7 +99,7 @@ tidy.score.hotel
 The conclusion
 --------------
 
-With a *p* − *v**a**l**u**e* of 3.805224610^{-4}, we can reject *H*<sub>0</sub> and conclude that the mean scores between the sexes is not equal.
+The F-test value for degrees of freedom (2, 59) is 10.137; with the F-statistic of 9.025 and a *p* − *v**a**l**u**e* of 3.805224610^{-4}, we can reject *H*<sub>0</sub> and conclude that the mean scores between the sexes is not equal.
 
 ------------------------------------------------------------------------
 
@@ -118,25 +129,39 @@ The data
 Download testscoredata.txt and read it in R
 
 ``` r
+#imput data
 sport  <- as.factor(c('B','B','B','B','B','T','T','T','T','S','S','S','S','S','S'))
 height <- c(66,65,68,64,67,63,61,62,60,62,65,63,62,63.5,66)
 jump   <- c(27,29,26,29,29,23,26,23,26,23,21,21,23,22,21.5)
+
+#make a table
+sports <- tibble(sport, height, jump)
+head(sports, 5)
 ```
+
+    ## # A tibble: 5 x 3
+    ##   sport height  jump
+    ##   <fct>  <dbl> <dbl>
+    ## 1 B         66    27
+    ## 2 B         65    29
+    ## 3 B         68    26
+    ## 4 B         64    29
+    ## 5 B         67    29
 
 The hypothesis
 --------------
 
-> *H*<sub>0</sub>: The mean scores between sexes is equal ( *μ*<sub>*o*</sub> = *μ*<sub>1</sub>).
+> *H*<sub>0</sub>: The mean difference between sports is equal ( *μ*<sub>*o*</sub> = *μ*<sub>1</sub>).
 
-> *H*<sub>*a*</sub>: The mean scores between sexes is not equal ( *μ*<sub>*o*</sub> ≠ *μ*<sub>1</sub>).
+> *H*<sub>*a*</sub>: The mean difference between sports is not equal ( *μ*<sub>*o*</sub> ≠ *μ*<sub>1</sub>).
 
 ``` r
-sports.manova <- stats::manova(cbind(height, jump) ~ sport, scores)
+sports.manova <- stats::manova(cbind(height, jump) ~ sport, sports)
 sports.manova
 ```
 
     ## Call:
-    ##    stats::manova(cbind(height, jump) ~ sport, scores)
+    ##    stats::manova(cbind(height, jump) ~ sport, sports)
     ## 
     ## Terms:
     ##                     sport Residuals
@@ -147,13 +172,42 @@ sports.manova
     ## Residual standard errors: 1.533197 1.329421
     ## Estimated effects may be unbalanced
 
+Initial impression is that we have a very obvious difference in means between responses.
+
 The test
 --------
+
+``` r
+tidy.sports.wilks <- broom::tidy(sports.manova, 
+                              test = "Wilks",
+                              intercept = FALSE)
+```
 
 The result:
 -----------
 
+``` r
+tidy.sports.wilks
+```
+
+    ## # A tibble: 2 x 7
+    ##   term         df   wilks statistic num.df den.df      p.value
+    ##   <chr>     <dbl>   <dbl>     <dbl>  <dbl>  <dbl>        <dbl>
+    ## 1 sport         2  0.0359      23.5      4     22  0.000000112
+    ## 2 Residuals    12 NA           NA       NA     NA NA
+
+Wilks' *Λ* score 0.036.
+
 The conclusion
 --------------
 
-With a *p* − *v**a**l**u**e* of 3.805224610^{-4}, we can reject *H*<sub>0</sub> and conclude that the mean scores between the sexes is not equal.
+With a *p* − *v**a**l**u**e* of 1.116880510^{-7}, we can safely reject *H*<sub>0</sub> and conclude that the mean vectors aross the sports not equal.
+
+Do some normality tests
+
+do some boxplots showing comparisions
+
+``` r
+library(RVAideMemoire)
+#mqqnorm(as.matrix(airpol.data.num.sub))
+```

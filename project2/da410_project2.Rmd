@@ -37,12 +37,21 @@ head(scores,5)
 > $H_a$: The mean scores between sexes is not equal ( $\mu_o \neq \mu_1$). 
 
 ```{r setting up the manova binding for scores}
+#sample covariance matrix
+scores.S <- scores %>% 
+  select(math, reading) %>% 
+  var()
+
+round(scores.S,3)
+```
+
+```{r}
 #build the manova binding
 scores.manova <- stats::manova(cbind(math, reading) ~ sex, scores)
 scores.manova
 ```
 
-We see that *resp 1* has a mean value of 19.976, while *resp 2* has a mean value of 3.768. Our initial impression is that the mean values are not equal. 
+
 
 ## The test 
 ```{r testing scores with hl}
@@ -59,7 +68,7 @@ tidy.score.hotel
 
 ## The conclusion
 
-With a $p-value$ of `r tidy.score.hotel$p.value[1]`, we can reject $H_0$ and conclude that the mean scores between the sexes is not equal.
+The F-test value for degrees of freedom (2, 59) is 10.137; with the F-statistic of 9.025 and a $p-value$ of `r tidy.score.hotel$p.value[1]`, we can reject $H_0$ and conclude that the mean scores between the sexes is not equal.
 
 ________
 ________
@@ -105,19 +114,31 @@ sports.manova <- stats::manova(cbind(height, jump) ~ sport, sports)
 sports.manova
 ```
 
+Initial impression is that we have a very obvious difference in means between responses. 
+
 ## The test 
 ```{r testing  with Wilks lambda}
-
+tidy.sports.wilks <- broom::tidy(sports.manova, 
+                              test = "Wilks",
+                              intercept = FALSE)
 ```
 
 ##The result: 
 ```{r show results for  Wilks lambda}
-
+tidy.sports.wilks
 ```
 
-Wilks' $\Lambda$ score is 
+Wilks' $\Lambda$ score `r round(tidy.sports.wilks$wilks[1],3)`. 
 
 ## The conclusion
 
-With a $p-value$ of `r tidy.score.hotel$p.value[1]`, we can reject $H_0$ and conclude that the mean scores between the sexes is not equal.
+With a $p-value$ of `r tidy.sports.wilks$p.value[1]`, we can safely reject $H_0$ and conclude that the mean vectors aross the sports not equal.
 
+Do some normality tests
+
+do some boxplots showing comparisions
+
+```{r}
+library(RVAideMemoire)
+#mqqnorm(as.matrix(airpol.data.num.sub))
+```
