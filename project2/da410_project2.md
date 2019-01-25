@@ -99,7 +99,7 @@ tidy.score.hotel
 The conclusion
 --------------
 
-The F-test value for degrees of freedom (2, 59) is 10.137; with the F-statistic of 9.025 and a *p* − *v**a**l**u**e* of 3.805224610^{-4}, we can reject *H*<sub>0</sub> and conclude that the mean scores between the sexes is not equal.
+With a *p* − *v**a**l**u**e* of 3.805224610^{-4}, we can reject *H*<sub>0</sub> and conclude that the mean vectors between the sexes is not equal.
 
 ------------------------------------------------------------------------
 

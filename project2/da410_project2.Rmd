@@ -51,8 +51,6 @@ scores.manova <- stats::manova(cbind(math, reading) ~ sex, scores)
 scores.manova
 ```
 
-
-
 ## The test 
 ```{r testing scores with hl}
 #use the HL method to test results.
@@ -68,7 +66,7 @@ tidy.score.hotel
 
 ## The conclusion
 
-The F-test value for degrees of freedom (2, 59) is 10.137; with the F-statistic of 9.025 and a $p-value$ of `r tidy.score.hotel$p.value[1]`, we can reject $H_0$ and conclude that the mean scores between the sexes is not equal.
+With a $p-value$ of `r tidy.score.hotel$p.value[1]`, we can reject $H_0$ and conclude that the mean vectors between the sexes is not equal.
 
 ________
 ________
