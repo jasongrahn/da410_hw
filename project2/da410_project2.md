@@ -223,6 +223,8 @@ RVAideMemoire::mqqnorm(sports %>% select(height, jump))
 
     ## [1] 9 6
 
+While the displayed confidence interval is quite spread, we see most values do reside near the line and can conclude normalicy.
+
 ``` r
 tidy.sports %>% 
   ggplot(aes(x = measurement)) +
@@ -232,9 +234,11 @@ tidy.sports %>%
   theme(legend.position="bottom")
 ```
 
-![](da410_project2_files/figure-markdown_github/unnamed-chunk-2-2.png)
+![](da410_project2_files/figure-markdown_github/unnamed-chunk-3-1.png)
 
-While the displayed confidence interval is quite spread, we see most values do reside near the line and can conclude normalicy.
+Histograms for either variable indicate we may not have normal distributions. Ideally we would have more samples in order to conduct a thorough analysis.
+
+We assume independence as we do not have evidence of the sampling methodology.
 
 C
 -
@@ -279,7 +283,7 @@ jump_box <- sports %>%
 cowplot::plot_grid(height_box,jump_box)
 ```
 
-![](da410_project2_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](da410_project2_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 Plotting the sample mean for each measurement on top of boxplots, we clearly see the distributions for each sport in each variable do not overlap. This reinforces the hypothesis test showing rejection of *H*<sub>0</sub>.
 
