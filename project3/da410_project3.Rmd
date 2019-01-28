@@ -66,34 +66,92 @@ admission_predictions %>%
 
 ## 4. Predict students with GPA and SAT score as below.
 ```{r build a dataframe of the students to predict}
+#the values
 GPA <- c(3.14, 3.08, 2.08, 3.22)
 GMAT <- c(470, 591, 641, 463)
 p_student <- as.factor(c("student1", "student2", "student3", "student4"))
 
-predict_me <- tibble(p_student, p_gpa, p_gmat)
-predict_me
+#put those in a table
+predict_me <- tibble(p_student, GPA, GMAT)
 
+#apply the model and save the output
 predict_subgroup <- predict(model_1, # predictions
                             newdata = predict_me)
-```
 
+#incorporate the output into the original table
+predict_me_output <- predict_me %>% 
+  mutate(predictions = predict_subgroup$class)
+```
 
 # Problem 2.
 
 ## 1. Use admission.csv as a training dataset.
+We already input this before, so let's call it again just to show we have it. 
+```{r}
+head(admission,5)
+```
 
-## 2. Train model using LDA by setting probability of admit is 50% while probability of not admit is 25% and probability of border is 25%.
+## 2. Train model using LDA by setting probability of `admit` is 50% while probability of `not admit` is 25% and probability of `border` is 25%.
+```{r}
+model_2 <- lda(formula = De ~ ., 
+                        data = admission, 
+                        prior = c(.5,.25,.25))
+
+model_2
+```
 
 ## 3. Calculate the misclassfication rate
+```{r classification rate for heavier}
+#apply the model to admissions with predict()
+predict_admit_2 <- predict(model_2, # predictions
+                data = admissions)
+
+#pull the classificaton predictions into their own frame
+predict_class_2 <- predict_admit_2$class
+
+#I might want to use that data later, so let's write these back to the table as the other predictions
+admission_predictions <- admission_predictions %>% 
+  mutate(predictions_2 = predict_admit_2$class,
+         LD1_2 = predict_admit_2$x[,1],
+         LD2_2 = predict_admit_2$x[,2])
+
+#back to misclassification
+#quick glance of predictions versus actuals
+table(predict_class_2, admission$De)
+
+admission_predictions %>% 
+  mutate(correct_class_2 = factor((De == predictions_2))) %>% 
+  group_by(correct_class_2) %>% 
+  summarise(classified_count = n(), 
+            total = nrow(admission_predictions)) %>% 
+  mutate(percentage = round(classified_count / total * 100, 2)) 
+```
 
 ## 4. Predict students with GPA and SAT score as below.
-3.14 	470
-3.08 	591
-2.08 	641
-3.22 	463
+```{r second prediction of small student group}
+#apply the model and save the output
+predict_subgroup_2 <- predict(model_2, # predictions
+                            newdata = predict_me)
+
+#incorporate the output into the previous prediction table
+predict_me_output <- predict_me_output %>% 
+  mutate(predictions_2 = predict_subgroup_2$class)
+
+predict_me_output
+```
 
 ## Compare differences of the result from problem1.
+```{r}
+
+```
 
 # Problem 3.
 
 ## Explain what is Quadratic Discriminant Analysis (QDA), and use QDA to train the model, discuss if this project can be done better by QDA, why or why not. 
+
+`QDA` is:
+
+```{r train with qda}
+
+```
+
