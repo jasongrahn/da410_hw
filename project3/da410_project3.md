@@ -87,12 +87,14 @@ table(predict_class, admission$De)
     ##      notadmit     0      0       26
 
 ``` r
-admission_predictions %>% 
+first_percentages <- admission_predictions %>% 
   mutate(correct_class = factor((De == predictions))) %>% 
   group_by(correct_class) %>% 
   summarise(classified_count = n(), 
             total = nrow(admission_predictions)) %>% 
   mutate(percentage = round(classified_count / total * 100, 2)) 
+
+first_percentages
 ```
 
     ## # A tibble: 2 x 4
@@ -120,7 +122,17 @@ predict_subgroup <- predict(model_1, # predictions
 #incorporate the output into the original table
 predict_me_output <- predict_me %>% 
   mutate(predictions = predict_subgroup$class)
+
+predict_me_output
 ```
+
+    ## # A tibble: 4 x 4
+    ##   p_student   GPA  GMAT predictions
+    ##   <fct>     <dbl> <dbl> <fct>      
+    ## 1 student1   3.14   470 border     
+    ## 2 student2   3.08   591 admit      
+    ## 3 student3   2.08   641 notadmit   
+    ## 4 student4   3.22   463 border
 
 Problem 2.
 ==========
@@ -205,19 +217,13 @@ table(predict_class_2, admission$De)
     ##        notadmit     0      0       26
 
 ``` r
-admission_predictions %>% 
+second_percentages <- admission_predictions %>% 
   mutate(correct_class_2 = factor((De == predictions_2))) %>% 
   group_by(correct_class_2) %>% 
   summarise(classified_count = n(), 
             total = nrow(admission_predictions)) %>% 
   mutate(percentage = round(classified_count / total * 100, 2)) 
 ```
-
-    ## # A tibble: 2 x 4
-    ##   correct_class_2 classified_count total percentage
-    ##   <fct>                      <int> <int>      <dbl>
-    ## 1 FALSE                          5    85       5.88
-    ## 2 TRUE                          80    85      94.1
 
 4. Predict students with GPA and SAT score as below.
 ----------------------------------------------------
@@ -245,6 +251,38 @@ predict_me_output
 Compare differences of the result from problem1.
 ------------------------------------------------
 
+``` r
+#One way to compare results is to look at the difference in percentages between missclassfied students
+
+# a negative number indicates that the second model was worse than the first. 
+# ie; the second model incorrectly predicted a larger count than the first.
+
+#a positive number indicates that the second model was better, that it more accurately predicted the actual
+first_percentages$percentage[1] - second_percentages$percentage[1]
+```
+
+    ## [1] 2.36
+
+We see that the second model decreased the misclassification rate by 2.36 points; that it accurately predicted the actual better than the first model.
+
+``` r
+first_percentages %>% 
+  dplyr::select(correct_class, percentage) %>% 
+  rename(first_model = percentage) %>% 
+  mutate(second_model = (second_percentages$percentage),
+         correct_class = factor(correct_class, levels = c(TRUE, FALSE))) %>% 
+  gather(key = sample, value = measurement, -correct_class) %>% 
+  ggplot(aes(x = sample, y = measurement, label = measurement)) +
+ # scale_x_discrete(position = "top") +
+  geom_col(aes(fill = correct_class)) +
+  theme_classic() + 
+  geom_label(vjust = "bottom") +
+  labs(title = "Percentages between accuracies between models",
+       subtitle = "TRUE predictions showed improvement between the first and second model.")
+```
+
+![](da410_project3_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
 Problem 3.
 ==========
 
@@ -252,3 +290,38 @@ Explain what is Quadratic Discriminant Analysis (QDA), and use QDA to train the 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 `QDA` is:
+
+``` r
+model_qda <- MASS::qda(formula = De ~ ., 
+                       data = admission, 
+                       prior = c(.5,.25,.25))
+#apply the QDA model to admissions with predict()
+predict_qda <- predict(model_qda, # predictions
+                           data = admissions)
+
+#pull the classificaton predictions into their own frame
+predict_qda_output <- predict_qda$class
+
+#I might want to use that data later, so let's write these back to the table as the other predictions
+admission_predictions <- admission_predictions %>% 
+  mutate(predictions_qda = predict_qda_output)
+
+#back to misclassification
+#quick glance of predictions versus actuals
+#table(predict_qda_output, admission$De)
+
+third_percentages <- admission_predictions %>% 
+  mutate(correct_class_3 = factor((De == predictions_qda))) %>% 
+  group_by(correct_class_3) %>% 
+  summarise(classified_count = n(), 
+            total = nrow(admission_predictions)) %>% 
+  mutate(percentage = round(classified_count / total * 100, 2)) 
+
+third_percentages
+```
+
+    ## # A tibble: 2 x 4
+    ##   correct_class_3 classified_count total percentage
+    ##   <fct>                      <int> <int>      <dbl>
+    ## 1 FALSE                          3    85       3.53
+    ## 2 TRUE                          82    85      96.5
