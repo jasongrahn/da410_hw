@@ -283,13 +283,28 @@ first_percentages %>%
 
 ![](da410_project3_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
+We should check for equal covariance just to make sure we're good.
+
+``` r
+heplots::boxM(cbind(GPA, GMAT) ~ De, 
+              data = admission)
+```
+
+    ## 
+    ##  Box's M-test for Homogeneity of Covariance Matrices
+    ## 
+    ## data:  Y
+    ## Chi-Sq (approx.) = 16.074, df = 6, p-value = 0.01336
+
+With a p-value of 0.0133598 we can be assured that the test of homogeneity of covariance passes, that the values are not covariant.
+
 Problem 3.
 ==========
 
 Explain what is Quadratic Discriminant Analysis (QDA), and use QDA to train the model, discuss if this project can be done better by QDA, why or why not.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-`QDA` is:
+Where LDA utilizes a linear boundary (straight lines) to separate classifiers, `QDA` utilizes non-linear boundaries. QDA fitment results in curved fitments (often multiple times over). This is excellent for classifications that have numerous variables and large data sets, but in small sample sizes results in poor performance due to overfitting.
 
 ``` r
 model_qda <- MASS::qda(formula = De ~ ., 
@@ -317,7 +332,6 @@ third_percentages <- admission_predictions %>%
             total = nrow(admission_predictions)) %>% 
   mutate(percentage = round(classified_count / total * 100, 2)) 
 
-
 knitr::kable(third_percentages) %>%
   kableExtra::kable_styling(bootstrap_options = "striped")
 ```
@@ -330,3 +344,5 @@ knitr::kable(third_percentages) %>%
 |:------------------|------------------:|------:|-----------:|
 | FALSE             |                  3|     85|        3.53|
 | TRUE              |                 82|     85|       96.47|
+
+I believe that LDA (method 2) is the better method to use for this project. While it does have a more accurate classification rate, given the sample size and quantity of variables, QDA is potentially over fitting the model to the data.

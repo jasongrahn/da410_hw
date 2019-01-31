@@ -2,7 +2,7 @@
 title: "da410_project3"
 author: "Jason Grahn"
 date: "1/27/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -185,7 +185,7 @@ With a p-value of `r heplots::boxM(cbind(GPA, GMAT) ~ De, data = admission)[3]` 
 
 ## Explain what is Quadratic Discriminant Analysis (QDA), and use QDA to train the model, discuss if this project can be done better by QDA, why or why not. 
 
-`QDA`, 
+Where LDA utilizes a linear boundary (straight lines) to separate classifiers, `QDA` utilizes non-linear boundaries. QDA fitment results in curved fitments (often multiple times over). This is excellent for classifications that have numerous variables and large data sets, but in small sample sizes results in poor performance due to overfitting. 
 
 ```{r train with qda}
 model_qda <- MASS::qda(formula = De ~ ., 
