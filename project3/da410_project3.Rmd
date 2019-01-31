@@ -172,12 +172,20 @@ first_percentages %>%
        subtitle = "TRUE predictions showed improvement between the first and second model.")
 ```
 
+We should check for equal covariance just to make sure we're good.
+
+```{r}
+heplots::boxM(cbind(GPA, GMAT) ~ De, 
+              data = admission)
+```
+
+With a p-value of `r heplots::boxM(cbind(GPA, GMAT) ~ De, data = admission)[3]` we can be assured that the test of homogeneity of covariance passes, that the values are not covariant.
+
 # Problem 3.
 
 ## Explain what is Quadratic Discriminant Analysis (QDA), and use QDA to train the model, discuss if this project can be done better by QDA, why or why not. 
 
-`QDA` is:
-
+`QDA`, 
 
 ```{r train with qda}
 model_qda <- MASS::qda(formula = De ~ ., 
@@ -205,7 +213,8 @@ third_percentages <- admission_predictions %>%
             total = nrow(admission_predictions)) %>% 
   mutate(percentage = round(classified_count / total * 100, 2)) 
 
-third_percentages
+knitr::kable(third_percentages) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
 ```
 
-
+I believe that LDA (method 2) is the better method to use for this project. While it does have a more accurate classification rate, given the sample size and quantity of variables, QDA is potentially over fitting the model to the data. 

@@ -317,11 +317,16 @@ third_percentages <- admission_predictions %>%
             total = nrow(admission_predictions)) %>% 
   mutate(percentage = round(classified_count / total * 100, 2)) 
 
-third_percentages
+
+knitr::kable(third_percentages) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
 ```
 
-    ## # A tibble: 2 x 4
-    ##   correct_class_3 classified_count total percentage
-    ##   <fct>                      <int> <int>      <dbl>
-    ## 1 FALSE                          3    85       3.53
-    ## 2 TRUE                          82    85      96.5
+    ## Warning in kableExtra::kable_styling(., bootstrap_options = "striped"):
+    ## Please specify format in kable. kableExtra can customize either HTML or
+    ## LaTeX outputs. See https://haozhu233.github.io/kableExtra/ for details.
+
+| correct\_class\_3 |  classified\_count|  total|  percentage|
+|:------------------|------------------:|------:|-----------:|
+| FALSE             |                  3|     85|        3.53|
+| TRUE              |                 82|     85|       96.47|
