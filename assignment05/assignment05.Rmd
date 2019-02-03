@@ -1,0 +1,18 @@
+---
+title: "da410_assignment5"
+author: "Jason Grahn"
+date: "2/3/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Chapter 9  Page 336-337:#9.7 (a)(b)(c)
+9.7 c, don't need to generate classification table, just use nearest neighbor method to assign 3rd vector of both two matrix into group1 or group2. For the detail, look at the example.
+
+You can use the data1.txt and data2.txt to read into data.
+
+Calculate step by step (you can use R to do matrix calculation, DO NOT use knn functions), make sure to provide intermediate steps. 
+
