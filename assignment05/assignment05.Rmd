@@ -6,7 +6,8 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+library(tidyverse)
 ```
 
 Chapter 9  Page 336-337:#9.7 (a)(b)(c)
@@ -15,4 +16,74 @@ Chapter 9  Page 336-337:#9.7 (a)(b)(c)
 You can use the data1.txt and data2.txt to read into data.
 
 Calculate step by step (you can use R to do matrix calculation, DO NOT use knn functions), make sure to provide intermediate steps. 
+
+#9.7 Do a classification analysis on the beetle data in Table 5.5 as follows:
+```{r import beetle data}
+beetles <- read.table(here::here("assignment05/T5_5_FBEETLES.DAT")) %>% 
+  rename(experiment_number = V1,
+         species = V2,
+         y1 = V3,
+         y2 = V4,
+         y3 = V5,
+         y4 = V6) %>% 
+  mutate(species = factor(species, 
+                          levels = c(1, 2)))
+
+head(beetles,5)
+```
+
+
+##(a) Find the cutoff point THEN the classification function. 
+
+Cutoff point = $\frac{1}{2}(\bar{z_1}+\bar{z_2})$
+Classification function = $z = (\bar{y}_1 - \bar{y}_2)' * S^{-1}_{pl}$
+```{r}
+# group by species
+beet1 <- subset(x = beetles, subset = (species == 1), y1:y4)
+beet2 <- subset(x = beetles, subset = (species == 2), y1:y4)
+
+# find group means for all variables for each species
+mean1 <- apply(X = beet1, FUN = mean, MARGIN = 2)
+mean1
+mean2 <- apply(X = beet2, FUN = mean, MARGIN = 2)
+mean2
+
+# find covariance matrix for each species
+cov1 <- cov(beet1)
+cov1
+cov2 <- cov(beet2)
+cov2
+
+# take a pause here. Check for equal covariances between groups (species)
+     # If ==, then proceed; if != then we need a different procedure
+# heplots::boxM(cbind(y1, y2, y3, y4) ~ species, data = beetles)
+# can't use heplots because samplesize is too small. using hotelling 
+beetles.manova <- stats::manova(cbind(y1, y2, y3, y4) ~ species, 
+                                data = beetles)
+
+tidy.beetles.manova <- broom::tidy(beetles.manova, 
+                              test = "Hotelling-Lawley",
+                              intercept = FALSE)
+tidy.beetles.manova 
+#### because hotelling t-test has p-value <0.001, we conclude equal covariance
+
+# find _pooled_ sample variance (S^1 _pl)
+
+
+# find the cutoff point (this is half the difference between group means) 
+
+# find the classification function
+
+
+``` 
+
+##(b) Find the classification table using the linear classification function in part (a).
+```{r}
+
+```
+
+##(c) Find the classification table using the nearest neighbor method.
+```{r}
+
+```
 
