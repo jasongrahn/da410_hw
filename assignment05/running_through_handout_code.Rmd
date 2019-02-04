@@ -1,0 +1,68 @@
+---
+title: "handout5"
+author: "Jason Grahn"
+date: "2/3/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+beetles <- read.table(here::here("assignment05/T5_5_FBEETLES.DAT")) %>% 
+  rename(experiment_number = V1,
+         species = V2,
+         y1 = V3,
+         y2 = V4,
+         y3 = V5,
+         y4 = V6) %>% 
+  mutate(species = factor(species, 
+                          levels = c(1, 2)))
+
+head(beetles,5)
+```
+
+```{r make groups}
+group1 <- beetles %>% filter(species == 1)
+group2 <- beetles %>% filter(species == 2)
+```
+
+```{r matrix lengths}
+n1 <- nrow(group1)
+n2 <- nrow(group2)
+```
+
+```{r covariances for each group}
+var1 <- var(group1 %>% select(y1:y4))
+var2 <- var(group2 %>% select(y1:y4))
+```
+
+```{r pooled variance}
+sp1 <- ((n1 - 1)*var1 + (n2 - 1)*var2)/(n1 + n2 - 2)
+```
+
+```{r find matrix means}
+#use group1 and group2
+beetle.mean1 <- round(apply(X = (group1 %>% select(y1:y4)), FUN = mean, MARGIN = 2),2)
+beetle.mean1
+beetle.mean2 <- round(apply(X = (group2 %>% select(y1:y4)), FUN = mean, MARGIN = 2),2)
+beetle.mean2
+```
+
+```{r find _a_}
+a <- sp1*(beetle.mean1 - beetle.mean2)
+a
+```
+
+```{r find z values}
+z1 <- t(a) %*% beetle.mean1
+z1
+z2 <- t(a) %*% beetle.mean2
+z2
+```
+
+```{r}
+.5 * (z1 + z2)
+```
+

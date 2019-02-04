@@ -89,7 +89,8 @@ round(cutoff,2)
 
 ```{r}
 # find the classification function
-
+species.prediction <- apply(beetles[,2:5], 1, function(y) {
+ z <- (mean1 - mean2) %*% solve(sp1) %*% y })
 ``` 
 
 ##(b) Find the classification table using the linear classification function in part (a).
