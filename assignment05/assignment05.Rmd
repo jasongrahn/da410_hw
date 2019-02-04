@@ -36,7 +36,7 @@ head(beetles,5)
 ##(a) Find the cutoff point THEN the classification function. 
 
 Cutoff point = $\frac{1}{2}(\bar{z_1}+\bar{z_2})$
-Classification function = $z = (\bar{y}_1 - \bar{y}_2)' * S^{-1}_{pl}$
+Classification function = $z = (\bar{y}_1 - \bar{y}_2)' * S^{-1}_{p1}$
 ```{r}
 # group by species
 beet1 <- subset(x = beetles, subset = (species == 1), y1:y4)
@@ -89,7 +89,7 @@ round(cutoff,2)
 
 ```{r}
 # find the classification function
-species.prediction <- apply(beetles[,2:5], 1, function(y) {
+species.prediction <- apply(beetles[,3:6], 1, function(y) {
  z <- (mean1 - mean2) %*% solve(sp1) %*% y })
 ``` 
 
