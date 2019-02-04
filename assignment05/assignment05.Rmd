@@ -2,7 +2,7 @@
 title: "da410_assignment5"
 author: "Jason Grahn"
 date: "2/3/2019"
-output: word_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -49,10 +49,10 @@ mean2 <- apply(X = beet2, FUN = mean, MARGIN = 2)
 mean2
 
 # find covariance matrix for each species
-cov1 <- cov(beet1)
-cov1
-cov2 <- cov(beet2)
-cov2
+var1 <- var(beet1)
+var1
+var2 <- var(beet2)
+var2
 
 # take a pause here. Check for equal covariances between groups (species)
      # If ==, then proceed; if != then we need a different procedure
@@ -66,14 +66,29 @@ tidy.beetles.manova <- broom::tidy(beetles.manova,
                               intercept = FALSE)
 tidy.beetles.manova 
 #### because hotelling t-test has p-value <0.001, we conclude equal covariance
+```
 
-# find _pooled_ sample variance (S^1 _pl)
+```{r}
+# find _pooled_ sample variance for each species
+#length of each set
+length1 <- nrow(beet1)
+length2 <- nrow(beet2)
 
+#variance of each set
+pvar1 <- (length1 - 1) * var1
+pvar2 <- (length2 - 1) * var2 
+
+#use length and variance to get pooled variance
+sp1 <- 1 / (length1 + length2 - 2) * (pvar1 + pvar2)
+sp1
 
 # find the cutoff point (this is half the difference between group means) 
+cutoff <- .5*(mean1 - mean2) %*% solve(sp1) %*% (mean1 + mean2)
+round(cutoff,2)
+```
 
+```{r}
 # find the classification function
-
 
 ``` 
 
