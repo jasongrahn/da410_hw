@@ -6,7 +6,8 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+library(tidyverse)
 ```
 
 ```{r}
@@ -56,13 +57,14 @@ a
 ```
 
 ```{r find z values}
-z1 <- t(a) %*% beetle.mean1
+#need to use solve() when we see a'x 
+z1 <- solve(a) %*% beetle.mean1
 z1
-z2 <- t(a) %*% beetle.mean2
+z2 <- solve(a) %*% beetle.mean2
 z2
 ```
 
 ```{r}
-.5 * (z1 + z2)
+.5 * (z1 + z2) %*% (mean1 + mean2)
 ```
 

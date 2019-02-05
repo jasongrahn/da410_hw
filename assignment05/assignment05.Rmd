@@ -81,21 +81,32 @@ pvar2 <- (length2 - 1) * var2
 #use length and variance to get pooled variance
 sp1 <- 1 / (length1 + length2 - 2) * (pvar1 + pvar2)
 sp1
+```
 
+```{r}
 # find the cutoff point (this is half the difference between group means) 
 cutoff <- .5*(mean1 - mean2) %*% solve(sp1) %*% (mean1 + mean2)
-round(cutoff,2)
+cutoff <- round(cutoff,2)
+cutoff
 ```
 
 ```{r}
 # find the classification function
-species.prediction <- apply(beetles[,3:6], 1, function(y) {
+species_prediction <- apply(beetles[,3:6], 1, function(y) {
  z <- (mean1 - mean2) %*% solve(sp1) %*% y })
 ``` 
 
 ##(b) Find the classification table using the linear classification function in part (a).
 ```{r}
+beetles <- beetles %>% 
+  #bring the species prediction data into the data frame
+  mutate(species_prediction = species_prediction,
+         #bring the cutoff data into the data frame
+         cutoff = cutoff,
+         #use the cutoff to determine the classification
+         classification = if_else(species.prediction >= cutoff, 1, 2))
 
+table(beetles$species, beetles$classification)
 ```
 
 ##(c) Find the classification table using the nearest neighbor method.
