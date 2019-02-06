@@ -109,7 +109,7 @@ beetles <- beetles %>%
 table(beetles$species, beetles$classification)
 ```
 
-##(c) Find the classification table using the nearest neighbor method.
+##(c) Describe how you use KNN thought to solve it instead of writing out R code or doing any real calculation.
 ```{r}
 
 ```
