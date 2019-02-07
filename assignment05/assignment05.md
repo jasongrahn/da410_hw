@@ -36,7 +36,7 @@ head(beetles,5)
 (a) Find the cutoff point THEN the classification function.
 -----------------------------------------------------------
 
-Cutoff point = $\\frac{1}{2}(\\bar{z\_1}+\\bar{z\_2})$ Classification function = $z = (\\bar{y}\_1 - \\bar{y}\_2)' \* S^{-1}\_{pl}$
+Cutoff point = $\\frac{1}{2}(\\bar{z\_1}+\\bar{z\_2})$ Classification function = $z = (\\bar{y}\_1 - \\bar{y}\_2)' \* S^{-1}\_{p1}$
 
 ``` r
 # group by species
@@ -106,29 +106,74 @@ tidy.beetles.manova
 #### because hotelling t-test has p-value <0.001, we conclude equal covariance
 ```
 
-![img](https://www.kean.edu/~fosborne/bstat/px/pooled-var-6-4-3.gif)
-
 ``` r
-# find _pooled_ sample variance (S^1 _pl)
+# find _pooled_ sample variance for each species
+#length of each set
 length1 <- nrow(beet1)
 length2 <- nrow(beet2)
 
+#variance of each set
 pvar1 <- (length1 - 1) * var1
 pvar2 <- (length2 - 1) * var2 
 
-(1/length1) + (1/length1) 
+#use length and variance to get pooled variance
+sp1 <- 1 / (length1 + length2 - 2) * (pvar1 + pvar2)
+sp1
 ```
 
-    ## [1] 0.1052632
+    ##           y1       y2        y3        y4
+    ## y1 143.55910 151.8034  42.52660  71.99253
+    ## y2 151.80341 367.7878 121.87653 106.24467
+    ## y3  42.52660 121.8765 118.31408  42.06401
+    ## y4  71.99253 106.2447  42.06401 208.07290
 
 ``` r
 # find the cutoff point (this is half the difference between group means) 
-
-# find the classification function
+cutoff <- .5*(mean1 - mean2) %*% solve(sp1) %*% (mean1 + mean2)
+cutoff <- round(cutoff,2)
+cutoff
 ```
+
+    ##        [,1]
+    ## [1,] -15.81
+
+``` r
+# find the classification function
+species_prediction <- apply(beetles[,3:6], 1, function(y) {
+ z <- (mean1 - mean2) %*% solve(sp1) %*% y })
+
+species_prediction
+```
+
+    ##  [1]  -4.640975 -12.769954  -3.599007  -8.333783  -8.398459  -8.319691
+    ##  [7]  -5.998789  -7.104974 -14.269659  -8.795039  -5.377660  -6.685556
+    ## [13]  -7.531402 -11.533464 -10.922504 -11.168223  -7.646623 -12.531815
+    ## [19] -14.524616 -26.822874 -17.458688 -26.373153 -24.334824 -25.694962
+    ## [25] -26.666573 -27.486750 -15.047912 -21.363037 -23.600898 -28.771377
+    ## [31] -22.022042 -20.074530 -26.994104 -21.101538 -23.623558 -16.050876
+    ## [37] -23.304407 -17.341090 -18.974629
 
 (b) Find the classification table using the linear classification function in part (a).
 ---------------------------------------------------------------------------------------
 
-(c) Find the classification table using the nearest neighbor method.
---------------------------------------------------------------------
+``` r
+beetles <- beetles %>% 
+  #bring the species prediction data into the data frame
+  mutate(species_prediction = species_prediction,
+         #bring the cutoff data into the data frame
+         cutoff = cutoff,
+         #use the cutoff to determine the classification
+         classification = if_else(species_prediction >= cutoff, 1, 2))
+
+table(beetles$species, beetles$classification)
+```
+
+    ##    
+    ##      1  2
+    ##   1 19  0
+    ##   2  1 19
+
+(c) Describe how you use KNN thought to solve it instead of writing out R code or doing any real calculation.
+-------------------------------------------------------------------------------------------------------------
+
+Start by selecting a data point in the first group. Calculating a "normalized" distance from data point 1 in Group1 to all other points in both groups. This is *typically* Euclidian distance. Select the *k*-value. If the number of groups is even, this has to be an odd number greater than the amount of groups. If the number of groups is odd, you can use this number. The algorithm will determine who are the **nearest neightbors** to a new data point. Whichever group has the highest number of neighbors to the new data point is considered the majority group. This is the group the new data point is assigned to.

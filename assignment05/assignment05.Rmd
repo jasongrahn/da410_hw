@@ -2,7 +2,7 @@
 title: "da410_assignment5"
 author: "Jason Grahn"
 date: "2/3/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -94,6 +94,8 @@ cutoff
 # find the classification function
 species_prediction <- apply(beetles[,3:6], 1, function(y) {
  z <- (mean1 - mean2) %*% solve(sp1) %*% y })
+
+species_prediction
 ``` 
 
 ##(b) Find the classification table using the linear classification function in part (a).
@@ -104,7 +106,7 @@ beetles <- beetles %>%
          #bring the cutoff data into the data frame
          cutoff = cutoff,
          #use the cutoff to determine the classification
-         classification = if_else(species.prediction >= cutoff, 1, 2))
+         classification = if_else(species_prediction >= cutoff, 1, 2))
 
 table(beetles$species, beetles$classification)
 ```
