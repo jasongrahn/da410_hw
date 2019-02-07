@@ -110,7 +110,8 @@ table(beetles$species, beetles$classification)
 ```
 
 ##(c) Describe how you use KNN thought to solve it instead of writing out R code or doing any real calculation.
-```{r}
 
-```
-
+Start by selecting a data point in the first group. 
+Calculating a "normalized" distance from data point 1 in Group1 to all other points in both groups. This is _typically_ Euclidian distance. 
+Select the _k_-value. If the number of groups is even, this has to be an odd number greater than the amount of groups. If the number of groups is odd, you can use this number.
+The algorithm will determine who are the __nearest neightbors__ to a new data point. Whichever group has the highest number of neighbors to the new data point is considered the majority group. This is the group the new data point is assigned to. 
