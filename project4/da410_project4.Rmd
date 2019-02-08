@@ -10,37 +10,93 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 library(tidyverse)
 library(class)
 library(caret)
-head(iris)
+library(ggcorrplot)
 ```
 
 Use R built-in function (e.g. knn) to do 9.7 (c), try different k values and find out the best solution. 
 
 Do some EDA at the very beginning and make a clean explanation of how and why you choose your final model.
 
-Summary Statistics
-```{r}
+# Data Load
 
+```{r}
+#iris is already loaded but I dont like camelcase headers so lets fix those then show head()
+data.table::setnames(iris, tolower(names(iris[1:5])))
+head(iris,5)
 ```
 
-Table 1: Summary Statistics of the Iris flower data set
+# Summary Statistics of the Iris flower data set
 ```{r}
-
+summary(iris)
 ```
 
-
-Table 2: Mean and standard deviation within each species
+# Mean and standard deviation within each species
 ```{r}
+#means
+iris %>% group_by(species) %>% 
+  summarise(mean(sepal.length),
+            mean(sepal.width),
+            mean(petal.length),
+            mean(petal.width))
 
+#standard deviations
+iris %>% group_by(species) %>% 
+  summarise(sd(sepal.length),
+            sd(sepal.width),
+            sd(petal.length),
+            sd(petal.width))
 ```
 
-2.2 Visualization
-2.2. Histogram and Density Plot
+# Visualization
+```{r message=FALSE, warning=FALSE}
+common_theme <- theme_light() +
+  theme(legend.position = "bottom")
 
-2.2.2 Scatter Plots
+histogram <- iris %>% 
+  ggplot() +
+  geom_histogram(aes(x = petal.length, fill=species)) +
+  labs(title = "Histogram") +
+  common_theme
 
-sepal length vs width
+density <- iris %>% 
+  ggplot() + 
+  geom_density(aes(x=petal.length, fill=species), alpha = 0.5) +
+  labs(title = "Density") +
+  common_theme
 
-pedal length vs width
+cowplot::plot_grid(histogram, density)
+```
+
+The histogram shows setosa clearly sits on it's own with very short petal lengths; but virginica and veriscolor have some overlap.
+
+Density plotting reiterates what we saw in the histogram and does a better job showing the overlap between virginica and versicolor. 
+
+##Scatter Plots
+```{r}
+sepal.scatter <- iris %>% ggplot() + 
+  geom_point(aes(x = sepal.length, y = sepal.width, color = species)) +
+  labs(title = "Sepal vars") +
+  common_theme
+
+petal.scatter <- iris %>% ggplot() + 
+  geom_point(aes(x = petal.length, y = petal.width, color = species)) +
+  labs(title = "Petal vars") +
+  common_theme
+
+cowplot::plot_grid(sepal.scatter, petal.scatter)
+```
+
+Scatterplotting for sepal variables show similar information that we saw in the histogram and density plots. Clustering of the setosa lengths and widths and mixtures of versicolor and viginica points. The petal variables are a bit more defined. Setosa certainly sits on it's own, and now we can see better definitions between versicolor and virginica species; with virginica having (generally) longer and wider petals than versicolor.
+
+## correlation
+```{r}
+corr <- round(cor(iris[1:4]), 2)
+
+ggcorrplot(corr, 
+           type = "lower",
+           outline.col = "white")
+```
+
 
 3. K - Nearest Neighbor
 3.1 Normalization
