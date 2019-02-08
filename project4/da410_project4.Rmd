@@ -9,7 +9,6 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 library(tidyverse)
 library(class)
-library(caret)
 library(ggcorrplot)
 ```
 
@@ -26,12 +25,12 @@ head(iris,5)
 ```
 
 # Summary Statistics of the Iris flower data set
-```{r}
+```{r summary stats}
 summary(iris)
 ```
 
 # Mean and standard deviation within each species
-```{r}
+```{r means and sds }
 #means
 iris %>% group_by(species) %>% 
   summarise(mean(sepal.length),
@@ -47,8 +46,11 @@ iris %>% group_by(species) %>%
             sd(petal.width))
 ```
 
+sepal width shows the smallest variation of means.
+petal length appears to have the largest differences.
+
 # Visualization
-```{r message=FALSE, warning=FALSE}
+```{r histogram and density plotting, message=FALSE, warning=FALSE}
 common_theme <- theme_light() +
   theme(legend.position = "bottom")
 
@@ -72,7 +74,7 @@ The histogram shows setosa clearly sits on it's own with very short petal length
 Density plotting reiterates what we saw in the histogram and does a better job showing the overlap between virginica and versicolor. 
 
 ##Scatter Plots
-```{r}
+```{r scatter plotting}
 sepal.scatter <- iris %>% ggplot() + 
   geom_point(aes(x = sepal.length, y = sepal.width, color = species)) +
   labs(title = "Sepal vars") +
@@ -88,21 +90,115 @@ cowplot::plot_grid(sepal.scatter, petal.scatter)
 
 Scatterplotting for sepal variables show similar information that we saw in the histogram and density plots. Clustering of the setosa lengths and widths and mixtures of versicolor and viginica points. The petal variables are a bit more defined. Setosa certainly sits on it's own, and now we can see better definitions between versicolor and virginica species; with virginica having (generally) longer and wider petals than versicolor.
 
-## correlation
-```{r}
-corr <- round(cor(iris[1:4]), 2)
+## Correlation
+```{r correlation plotting}
+# correlation matrix
+R <- round(cor(iris %>% select(-species)), 2)
 
-ggcorrplot(corr, 
-           type = "lower",
-           outline.col = "white")
+# Identify which pairs of variables seem to be strongly associated
+#and describe the nature (strength and direction) of the relationship between these variable pairs.
+ggcorrplot(R, #the correlation matrix
+           type = "lower", #only color the bottom half
+           title = "correlation matrix of iris data", #give it a header
+           show.legend = TRUE, #show the legend
+           digits = 2, #round all digits
+           lab = TRUE) #and show the values in the boxes
 ```
 
+Correlation shows us the strongest relationships exist between petal width and length; then petal and sepal length; finally petal width and sepal length. Clearly the petals bind the strongest relatinships. 
 
-3. K - Nearest Neighbor
-3.1 Normalization
+# Building K-Nearest Neighbor
 
-3.2 Splitting Data Set into Training and Test Sets
+## Normalization
 
-3.3 K-Nearest Neighbor in R
+Given the range of values for the _iris_ dataset, no normalization is required.
 
-prediction scatter plot
+## Splitting Data Set into Training and Test Sets
+
+
+```{r subset datasets}
+set.seed(1234)
+
+ind <- sample(2, 
+              nrow(iris), 
+              replace=TRUE, 
+              prob=c(0.66, 0.34))
+
+# make training set and labels
+iris.training <- iris[ind==1, 1:4]
+iris.trainLabels <- iris[ind==1,5]
+
+# make testing set and labels
+iris.test <- iris[ind==2, 1:4]
+iris.testLabels <- iris[ind==2, 5]
+```
+
+## K-Nearest Neighbor in R
+```{r}
+iris.knn <- knn(train = iris.training,
+                test = iris.test, 
+                k = 3,
+                cl = iris.trainLabels)
+
+table(iris.knn)
+```
+
+## Analyse the correctness 
+
+```{r accuracy table}
+table(iris.testLabels, iris.knn)
+```
+
+The output of the kNN misclassified 1 _versicolor_ iris as a _verginica_ iris.
+
+### Prediction scatter plot
+
+```{r}
+accuracy.table <- iris %>% 
+  mutate(ind = ind) %>% 
+  filter(ind == 2) %>% 
+  mutate(iris.knn = iris.knn,
+         predict.true = if_else(species == iris.knn, TRUE, FALSE))
+
+sepal.scatter.2 <- accuracy.table %>% ggplot() + 
+  geom_point(aes(x = sepal.length, y = sepal.width, color = species)) +
+  labs(title = "Sepal vars") +
+  common_theme
+
+petal.scatter.2 <- accuracy.table %>% ggplot() + 
+  geom_point(aes(x = petal.length, y = petal.width, color = species)) +
+  labs(title = "Petal vars") +
+  common_theme
+
+sepal.predict <- accuracy.table %>% ggplot() + 
+  geom_point(aes(x = sepal.length, y = sepal.width, color = iris.knn)) +
+  labs(title = "Sepal vars") +
+  common_theme
+
+petal.predict <- accuracy.table %>% ggplot() + 
+  geom_point(aes(x = petal.length, y = petal.width, color = iris.knn)) +
+  labs(title = "Petal vars") +
+  common_theme
+
+cowplot::plot_grid(sepal.scatter.2, sepal.predict)
+cowplot::plot_grid(petal.scatter.2, petal.predict)
+```
+
+Plotting sepal and petal variables before and after training shows very close alignment. We know from the above table that there was only 1 misclassified flower from the test set, but which flower was hard to discern in the plots. Let's work to call out which flower was incorrectly labelled.
+
+```{r}
+petal.tf <- accuracy.table %>% ggplot() + 
+  geom_point(aes(x = petal.length, y = petal.width, color = iris.knn, size = desc(predict.true))) +
+  labs(title = "Petal vars") +
+  common_theme+
+  theme(legend.position = "none")
+
+sepal.tf <- accuracy.table %>%  ggplot() + 
+  geom_point(aes(x = sepal.length, y = sepal.width, color = iris.knn, size = desc(predict.true))) +
+  labs(title = "Sepal vars") +
+  common_theme +
+  theme(legend.position = "none")
+
+cowplot::plot_grid(petal.tf, sepal.tf)
+```
+
