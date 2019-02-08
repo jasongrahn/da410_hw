@@ -2,7 +2,7 @@
 title: "da410_project4_grahn"
 author: "Jason Grahn"
 date: "2/7/2019"
-output: word_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
