@@ -1,0 +1,52 @@
+---
+title: "da410_project4_grahn"
+author: "Jason Grahn"
+date: "2/7/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+library(tidyverse)
+library(class)
+library(caret)
+head(iris)
+```
+
+Use R built-in function (e.g. knn) to do 9.7 (c), try different k values and find out the best solution. 
+
+Do some EDA at the very beginning and make a clean explanation of how and why you choose your final model.
+
+Summary Statistics
+```{r}
+
+```
+
+Table 1: Summary Statistics of the Iris flower data set
+```{r}
+
+```
+
+
+Table 2: Mean and standard deviation within each species
+```{r}
+
+```
+
+2.2 Visualization
+2.2. Histogram and Density Plot
+
+2.2.2 Scatter Plots
+
+sepal length vs width
+
+pedal length vs width
+
+3. K - Nearest Neighbor
+3.1 Normalization
+
+3.2 Splitting Data Set into Training and Test Sets
+
+3.3 K-Nearest Neighbor in R
+
+prediction scatter plot
