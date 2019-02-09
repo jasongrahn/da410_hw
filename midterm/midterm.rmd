@@ -1,0 +1,242 @@
+---
+title: "midterm"
+author: "Jason Grahn"
+date: "2/9/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+library(tidyverse)
+```
+
+# 4 
+In the following table, we have a comparison of four reagents. The first reagent is the one presently in use and the other three are less expensive reagents that we wish to compare with the first. All four reagents are used with a blood sample from each patient.
+
+The three variables measured for each reagent are 𝑦1=white blood count, 𝑦2=red blood count, and 𝑦3=hemoglobin count. Compare the four reagents using all four MANOVA tests. State each hypotheses clearly, and interpret the results.
+```{r import reagent, message=FALSE, warning=FALSE}
+reagent <- readr::read_table2(file = here::here("/midterm/T6_19_REAGENT.DAT"),
+                   col_names = FALSE) %>% 
+  rename(reagent = X1,
+         subject = X2,
+         y1 = X3,
+         y2 = X4,
+         y3 = X5) %>% 
+  mutate(reagent = factor(reagent),
+         subject = factor(subject))
+
+head(reagent,5)
+```
+
+```{r build manova}
+manova.reagent <- manova(cbind(y1, y2, y3) ~ reagent,
+                         data=reagent)
+
+manova.reagent
+```
+
+## The Hypothesis 
+> $H_0$: The mean vectors between reagents are equal ( $\mu_o = \mu_1$).
+
+> $H_a$: The mean vectors between reagents are not equal ( $\mu_o \neq \mu_1$). 
+
+## The tests
+
+```{r}
+reagent.lambda <- broom::tidy(manova.reagent, test = "Wilks")
+reagent.lambda
+```
+
+### Wilks interpretation
+p-Value of reagent.lambda is `r reagent.lambda$p.value[1]`. This value is above 0.05; so we do not reject $H_0$ and conclude that the means are equal. 
+
+```{r}
+reagent.pillai <- broom::tidy(manova.reagent, test = "Pillai")
+reagent.pillai
+```
+
+### Pillai interpretation
+p-Value of reagent.pillai is `r reagent.pillai$p.value[1]`. This value is above 0.05; so we do not reject $H_0$ and conclude that the means are equal. 
+
+```{r}
+reagent.hotel <- broom::tidy(manova.reagent, test = "Hotelling-Lawley")
+reagent.hotel
+```
+
+### Hotelling interpretation
+
+p-Value of reagent.hotel is `r reagent.hotel$p.value[1]`. This value is above 0.05; so we do not reject $H_0$ and conclude that the means are equal. 
+
+```{r}
+reagent.roy <- broom::tidy(manova.reagent, test = "Roy",
+                           intercept = FALSE)
+
+reagent.roy
+
+roy.theta <- reagent.roy %>%  #use that tidy tibble
+  filter(term != "Residuals") %>%  #filter out residuals because I dont need them
+  select(term, roy) %>% #keep the columns I want
+  mutate(roys_theta = round((roy / (1 + roy)), 3)) #make roy's theta
+roy.theta
+```
+
+### Hotelling interpretation
+
+p-Value of reagent.roy is `r reagent.roy$p.value[1]`. While this value is below 0.05; Roy's Theta is `r roy.theta$roys_theta[1]` so we do not reject $H_0$ and conclude that the means are equal. 
+
+#5 
+The table below displays scores on math, English, and art tests for 5 students. Note that data from the table is represented in matrix A, where each column in the matrix shows scores on a test and each row shows scores for a student:
+
+```{r load student data}
+#input data
+student <- as.factor(c(1, 2, 3, 4, 5))
+math    <- c(90,90,60,60,30) 
+english <- c(60,90,60,60,30)
+art     <- c(90,30,60,90,30)
+
+#make a table
+students <- tibble(student, math, english, art)
+#students
+```
+
+## (a) Calculate the sample covariance matrix S
+```{r}
+S <- round(var(students %>% select(-student)), 2)
+S
+```
+
+## (b) Calculate the sample correlation matrix R.
+```{r}
+R <- round(cor(S), 2)
+R
+```
+
+## (c) Now let’s define 𝑧 = −2𝑦1 + 3𝑦2 + 𝑦3,where 𝑦1denotes Math scores, 𝑦2 denotes English scores, and 𝑦3 denotes Art scores. Find the sample mean vector 𝑧 and the sample variance 𝑠2.
+```{r}
+#build the constant matrix
+a <- matrix(c(-2, 3, 1))
+
+#gather the column means
+y <- colMeans(students %>% select(2:4))
+
+#sample mean vector
+z <- y %*% t(a)
+z
+
+#sample variance
+s2 <- t(a) %*% as.matrix(S) %*% a
+s2
+```
+
+#6 
+Use the beetle data, do the following:
+```{r load beetle data}
+beetles <- readr::read_table2(file = here::here("/midterm/T5_5_FBEETLES.DAT"),
+                   col_names = FALSE) %>% 
+  rename(exp.no = X1,
+         species = X2,
+         y1 = X3,
+         y2 = X4,
+         y3 = X5,
+         y4 = X6) %>% 
+  mutate(species = factor(species),
+         exp.no = factor(exp.no))
+
+head(beetles,5)
+```
+
+(a) Find the classification function and cutoff point.
+```{r}
+# group by species
+beet1 <- subset(x = beetles, subset = (species == 1), y1:y4)
+beet2 <- subset(x = beetles, subset = (species == 2), y1:y4)
+# find group means for all variables for each species
+mean1 <- apply(X = beet1, FUN = mean, MARGIN = 2)
+#mean1
+mean2 <- apply(X = beet2, FUN = mean, MARGIN = 2)
+#mean2
+# find covariance matrix for each species
+var1 <- var(beet1)
+#var1
+var2 <- var(beet2)
+#var2
+
+beetles.manova <- stats::manova(cbind(y1, y2, y3, y4) ~ species, 
+                                data = beetles)
+
+# find _pooled_ sample variance for each species
+## length of each set
+length1 <- nrow(beet1)
+length2 <- nrow(beet2)
+## variance of each set
+pvar1 <- (length1 - 1) * var1
+pvar2 <- (length2 - 1) * var2 
+## use length and variance to get pooled variance
+sp1 <- 1 / (length1 + length2 - 2) * (pvar1 + pvar2)
+#sp1
+
+cutoff <- .5*(mean1 - mean2) %*% solve(sp1) %*% (mean1 + mean2)
+cutoff <- round(cutoff,2)
+cutoff
+```
+
+```{r}
+species_prediction <- apply(beetles[,3:6], 1, function(y) {
+ z <- (mean1 - mean2) %*% solve(sp1) %*% y })
+species_prediction
+```
+
+(b) Find the classification table using the nearest neighbor method by setting k = 3.
+```{r Building KNearest Neighbor}
+library(class)
+## Normalization
+normalize <- function(x) {
+  return((x - min(x)) / (max(x) - min(x))) }
+
+normalized.beetles <- as.data.frame(lapply(beetles[3:6], normalize))
+
+## Splitting Data Set into Training and Test Sets
+## r subset datasets
+set.seed(42)
+ind <- sample(2, 
+              nrow(beetles), 
+              replace=TRUE, 
+              prob=c(0.67, 0.33))
+
+# make training set and labels
+beetles.training <- beetles[ind==1, 1:6]
+beetles.trainLabels <- beetles[ind==1,5]
+# make testing set and labels
+beetles.test <- beetles[ind==2, 1:4]
+beetles.testLabels <- beetles[ind==2, 5]
+```
+
+## K-Nearest Neighbor in R
+```{r}
+iris.knn <- knn(train = iris.training,
+                test = iris.test, 
+                k = 6,
+                cl = iris.trainLabels)
+table(iris.knn)
+```
+```
+
+(c) Calculate misclassification rate.
+```{r}
+
+```
+
+
+#7
+
+```{r}
+
+```
+
+# 8
+The following table contains data from O’Sullivan and Mahan with measurements of blood glucose levels on three occasions for 30 women. The 𝑦’s represent fasting glucose measurements on the three occasions; the 𝑥’s are glucose measurements 1 hour after sugar intake. Find the mean vector and covariance matrix for all six variables and partition them into
+
+```{r}
+
+```
+
