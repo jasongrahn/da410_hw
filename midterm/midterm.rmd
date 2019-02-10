@@ -6,7 +6,7 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(message = FALSE, include = FALSE)
 library(tidyverse)
 library(class)
 library(MASS)
@@ -75,16 +75,13 @@ reagent.roy <- broom::tidy(manova.reagent, test = "Roy",
 
 reagent.roy
 
-roy.theta <- reagent.roy %>%  #use that tidy tibble
-  filter(term != "Residuals") %>%  #filter out residuals because I dont need them
-  select(term, roy) %>% #keep the columns I want
-  mutate(roys_theta = round((roy / (1 + roy)), 3)) #make roy's theta
+roy.theta <- round(reagent.roy$roy[1]/(reagent.roy$roy[1] + 1), 3)
 roy.theta
 ```
 
-### Hotelling interpretation
+### Roy interpretation
 
-p-Value of reagent.roy is `r reagent.roy$p.value[1]`. While this value is below 0.05; Roy's Theta is `r roy.theta$roys_theta[1]` so we do not reject $H_0$ and conclude that the means are equal. 
+p-Value of reagent.roy is `r reagent.roy$p.value[1]`. While this value is below 0.05; Roy's Theta is `r roy.theta` so we do not reject $H_0$ and conclude that the means are equal. 
 
 #5 
 The table below displays scores on math, English, and art tests for 5 students. Note that data from the table is represented in matrix A, where each column in the matrix shows scores on a test and each row shows scores for a student:
@@ -103,7 +100,9 @@ students <- tibble(student, math, english, art)
 
 ## (a) Calculate the sample covariance matrix S
 ```{r}
-S <- round(var(students %>% select(-student)), 2)
+S <- round(var(students %>% 
+                 select(math, english, art))
+           , 2)
 S
 ```
 
@@ -289,11 +288,70 @@ beetle_predictions
 It's not clear if this question is asking about LDA for the overall beetle prediction or just the new observation. Assuming this question is asking about the overall beetle population, the misclassification rate is `r beetle_predictions$percentage[1]` %. 
 
 # 8
-The following table contains data from O’Sullivan and Mahan with measurements of blood glucose levels on three occasions for 30 women. The 𝑦’s represent fasting glucose measurements on the three occasions; the 𝑥’s are glucose measurements 1 hour after sugar intake. Find the mean vector and covariance matrix for all six variables and partition them into
+The following table contains data from O’Sullivan and Mahan with measurements of blood glucose levels on three occasions for 30 women. The 𝑦’s represent fasting glucose measurements on the three occasions; the 𝑥’s are glucose measurements 1 hour after sugar intake.
 
-```{r import student}
+```{r import glucose}
 glucose <- read_csv(here::here("midterm/glucose.csv"))
 
 head(glucose, 5)
 ```
 
+## Find the mean vector 
+```{r mean vector}
+glucose_means <- matrix(colMeans(glucose))
+glucose_means
+```
+
+## ... and covariance matrix for all six variables 
+```{r covariance matrix}
+S_glucose <- round(var(glucose), 2)
+S_glucose
+```
+
+# 9 
+Various aspects of economic cycles were measured for consumer goods and producer goods by Tintner. The variables are: 
+
+    𝑦1=length of cycle
+    𝑦2=percentage of rising prices
+    𝑦3=cyclical amplitude
+    𝑦4=rate of change
+
+The data for several items are given in the following table:
+```{r import goods}
+goods <- readr::read_table2(file = here::here("/midterm/T5_8_GOODS.DAT"),
+                   col_names = FALSE) %>% 
+  rename(item = X1,
+         goods_type = X2,
+         y1 = X3,
+         y2 = X4,
+         y3 = X5,
+         y4 = X6) %>% 
+  mutate(item = factor(item),
+         goods_type = factor(goods_type))
+
+head(goods,5)
+```
+
+## Use Hotelling’s $T^2$ test to test for a difference in the mean measurements vector of the Consumers Goods and the mean vector of the Producer Goods. State each hypotheses clearly, and interpret the results.
+
+###  The Hypothesis 
+> $H_0$: The mean vectors between good types are equal ( $\mu_o = \mu_1$).
+
+> $H_a$: The mean vectors between good types are not equal ( $\mu_o \neq \mu_1$). 
+
+```{r build goods manova}
+manova.goods <- manova(cbind(y1, y2, y3, y4) ~ goods_type,
+                       data=goods)
+
+manova.goods
+```
+
+### The Test
+```{r apply hotelling test to goods manova}
+goods.hotel <- broom::tidy(manova.goods, test = "Hotelling-Lawley")
+goods.hotel
+```
+
+### The Interpretation
+
+p-Value of reagent.hotel is `r round(goods.hotel$p.value[1],3)`. This value is above 0.05; so we reject $H_0$ and conclude that the means vectors are _not_ equal between consumer and producer goods. 
