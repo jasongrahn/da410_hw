@@ -2,11 +2,11 @@
 title: "midterm"
 author: "Jason Grahn"
 date: "2/9/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message = FALSE, include = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(class)
 library(MASS)
@@ -94,15 +94,13 @@ english <- c(60,90,60,60,30)
 art     <- c(90,30,60,90,30)
 
 #make a table
-students <- tibble(student, math, english, art)
-#students
+students <- tibble(math, english, art)
+students
 ```
 
 ## (a) Calculate the sample covariance matrix S
 ```{r}
-S <- round(var(students %>% 
-                 select(math, english, art))
-           , 2)
+S <- round(var(students), 2)
 S
 ```
 
@@ -118,7 +116,7 @@ R
 a <- matrix(c(-2, 3, 1))
 
 #gather the column means
-y <- colMeans(students %>% select(2:4))
+y <- colMeans(students)
 
 #sample mean vector
 z <- y %*% t(a)
@@ -140,7 +138,7 @@ beetles <- readr::read_table2(file = here::here("/midterm/T5_5_FBEETLES.DAT"),
          y2 = X4,
          y3 = X5,
          y4 = X6) %>% 
-  select(y1, y2, y3, y4, species) %>% 
+  dplyr::select(y1, y2, y3, y4, species) %>% 
   mutate(species = factor(species))
 
 head(beetles,5)
