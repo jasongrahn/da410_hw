@@ -1,0 +1,32 @@
+---
+title: "assignment06"
+author: "Jason Grahn"
+date: "2/12/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Chapter 11 Page 402: 
+
+#11.9 part (a)
+
+## 1. You may use R to solve this part (NO built-in function). 
+To get full credit, make sure you include the following steps, with code and output:
+
+### a)  the sample correlation matrix
+```{r}
+
+```
+
+### b)  the characteristic equation
+```{r}
+
+```
+
+### c) eigenvalues
+```{r}
+
+```
