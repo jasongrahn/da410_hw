@@ -1,0 +1,56 @@
+---
+title: "project5"
+author: "Jason Grahn"
+date: "2/16/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r package load, message=FALSE, warning=FALSE}
+library(CCA)
+library(tidyverse)
+library(yacca)
+```
+
+#Use R to solve Chapter 11 Page 402: #11.9
+Make sure you include the commands and outputs, as well as the interpretations of the outputs.
+
+11.9 Use the sons data of Table 3.8.
+```{r import sons data}
+sons <- read.table(here::here("assignment06/T3_8_SONS.DAT"))  %>% 
+  rename(y1 = V1, # head length
+         y2 = V2, # head breadth
+         x1 = V3, # head length
+         x2 = V4) # head breadth
+
+head(sons, 5)
+```
+
+```{r subgrouping sons}
+#subgroup the data into first and second sons
+first.son <- sons %>% select(y1, y2)
+second.son <- sons %>% select(x1, x2)
+```
+
+```{r}
+cc_output <- cca(first.son, second.son)
+```
+
+## (a) Find the canonical correlations between ($y_1$,$y_2$) and ($x_1$, $x_1$)·
+```{r}
+cc_output$corr
+```
+
+#(b) Find the standardized coefficients for the canonical variates.
+```{r}
+cc_output
+```
+
+#(c) Test the significance of each canonical correlation.
+```{r}
+F.test.cca(cc_output)
+```
+
