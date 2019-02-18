@@ -24,15 +24,16 @@ sons <- read.table(here::here("assignment06/T3_8_SONS.DAT"))  %>%
          x1 = V3, # head length
          x2 = V4) # head breadth
 
-head(sons, 5)
+knitr::kable(head(sons, 5))
 ```
 
-    ##    y1  y2  x1  x2
-    ## 1 191 155 179 145
-    ## 2 195 149 201 152
-    ## 3 181 148 185 149
-    ## 4 183 153 188 149
-    ## 5 176 144 171 142
+|   y1|   y2|   x1|   x2|
+|----:|----:|----:|----:|
+|  191|  155|  179|  145|
+|  195|  149|  201|  152|
+|  181|  148|  185|  149|
+|  183|  153|  188|  149|
+|  176|  144|  171|  142|
 
 ``` r
 ggpairs(sons)
@@ -55,13 +56,13 @@ cc_output <- cc(first.son, second.son)
 ---------------------------------------------------------------------------------------------------------------------
 
 ``` r
-cca_output$corr[1]
+cca_output$corr
 ```
 
-    ##      CV 1 
-    ## 0.7885079
+    ##      CV 1      CV 2 
+    ## 0.7885079 0.0537397
 
-*r*<sub>1</sub> is 0.7885079 and *r*<sub>2</sub> is 0.0537397
+*r*<sub>1</sub> is 0.7885079 and *r*<sub>2</sub> is 0.0537397. This shows us that the canonical correlation between \[one thing\] and \[the other thing\] is positive and strong, while the canonical correlation between \[something else\] and \[one more thing\], while positive, is quite weak.
 
 (b) Find the standardized coefficients for the canonical variates.
 ==================================================================
@@ -96,4 +97,6 @@ F.test.cca(cca_output)
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-The output of the F-test shows us the
+The Canonical correlation value of (0.7885079) between the head length and head breadth for the *first son* tests to significance with a p-value of 0.0003256.
+
+The output of the F-test also shows us that the canonical correlation between the head length and head breadth for the *second son* is **not** significant. This tested out to a p-value of 0.8030550 given it's canonical correlation of 0.053740.

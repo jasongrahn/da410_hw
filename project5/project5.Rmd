@@ -2,7 +2,7 @@
 title: "project5"
 author: "Jason Grahn"
 date: "2/16/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -27,7 +27,7 @@ sons <- read.table(here::here("assignment06/T3_8_SONS.DAT"))  %>%
          x1 = V3, # head length
          x2 = V4) # head breadth
 
-head(sons, 5)
+knitr::kable(head(sons, 5))
 
 ggpairs(sons)
 ```
@@ -61,4 +61,6 @@ cca_output[3:4]
 F.test.cca(cca_output)
 ```
 
-The output of the F-test shows us the 
+The Canonical correlation value of (0.7885079) between the head length and head breadth for the _first son_ tests to significance with a p-value of 0.0003256.
+
+The output of the F-test also shows us that the canonical correlation between the head length and head breadth for the _second son_ is __not__ significant. This tested out to a p-value of 0.8030550 given it's canonical correlation of 0.053740.
