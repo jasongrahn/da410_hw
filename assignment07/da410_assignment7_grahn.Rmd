@@ -1,0 +1,155 @@
+---
+title: "assignment07"
+author: "Jason Grahn"
+date: "2/19/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+library(dplyr)
+```
+
+```{r data load}
+probe <- read.table(here::here("assignment07/T3_6_PROBE.DAT"))  %>% 
+  rename(subject_number = V1,
+         y1 = V2, # no explanation
+         y2 = V3, # no explanation
+         y3 = V4, # no explanation
+         y4 = V5, # no explanation
+         y5 = V6,) %>% 
+  mutate(subject_number = factor(subject_number))# no explanation
+
+head(probe, 3)
+# given the data has higher numbers, we should scale this
+```
+
+```{r variable selection}
+# First, variable selection
+probe.var <- probe %>% select(y1, y2, y3, y4)
+probe.subjects <- probe %>% select(subject_number)
+```
+
+Do a principle component analysis of the data in Table 3.6 (page 79)
+You may use R to solve this part (NO built-in function).
+
+```{r}
+# scale, center, and apply PCA 
+probe.pca <- prcomp(probe.var,
+                    center = TRUE,
+                    scale. = TRUE) 
+# print method
+print(probe.pca)
+
+# summary method
+summary(probe.pca)
+```
+
+```{r}
+# plot method
+## borrowing some plotting code from 
+## https://towardsdatascience.com/principal-component-analysis-pca-101-using-r-361f4c53a9ff 
+screeplot(probe.pca, type = "l", main = "Screeplot of the PCs")
+abline(h = 0.5, 
+       col="red", 
+       lty=5)
+legend("topright", 
+       legend=c("Eigenvalue = .5"),
+       col=c("red"), 
+       lty=5, 
+       cex=0.6)
+
+cumpro <- round(cumsum(probe.pca$sdev^2 / sum(probe.pca$sdev^2)),4)
+plot(cumpro[0:4], 
+     xlab = "PC #", 
+     ylab = "Amount of explained variance", 
+     main = "Cumulative variance plot")
+abline(v = 3, col="blue", lty=5)
+abline(h = 0.95, col="blue", lty=5)
+legend("topleft", 
+       legend=c("Cut-off @ PC3"),
+       col=c("blue"), lty=5, cex=0.6)
+
+plot(probe.pca$x[,1],
+     probe.pca$x[,2], 
+     xlab="PC1 (73.12%)", 
+     ylab = "PC2 (14.58%)", 
+     main = "PC1 / PC2 - plot")
+```
+
+```{r}
+# Predict PCs
+predict(probe.pca, 
+        newdata = tail(log(probe.var), 2))
+```
+
+# a) Use both S and R. 
+## Show your S and R matrix, and the corresponding eigenvalues and eigenvectors of S and R to get full credits
+```{r using covariance S}
+# Center and scale
+probe.scaled <- scale(probe.var, 
+                      center = TRUE, 
+                      scale = TRUE)
+
+# 1. Correlation matrix
+res.cor <- cor(probe.scaled)
+(round(res.cor, 2))
+
+# 2. Calculate eigenvectors/eigenvalues
+(res.eig <- eigen(res.cor))
+
+# 3. Calculate Propotion
+round(res.eig$values/(sum(res.eig$values)), 4)
+```
+
+```{r using correlation R}
+# 1. Covariance matrix
+res.cov <- cov(probe.scaled)
+round(res.cov, 2)
+
+# 2. Calculate eigenvectors/eigenvalues
+(eigen(res.cov))
+
+# 3. Calculate Propotion
+R.prop <- round(res.eig$values/(sum(res.eig$values)), 4)
+R.prop
+```
+
+# b) Show the percent of variance explained.
+```{r variance explanation}
+round(sum(R.prop), 2)
+
+# alternatively, using the individual components
+round(R.prop[1] + R.prop[2] + R.prop[3] + R.prop[4], 2) 
+
+# alternatively, using the model summary
+round(sum(summary(probe.pca)$importance[2,]), 2)
+```
+
+Using all four PCA components appears to explain 100% of the variation of the data. This is a tiny dataset, so this isn't completely out of the question; though it is highly unlikely in a real-world scenario. 
+
+# c) Decide how many components to retain. Show your reasons.
+
+This is an assumptive decision made by the analyst. I would retain the first two components. The reasons I would retain only these two are: 
+
+* Makes for easy plotting.
+* Accounts for enough variance within the data (`r scales::percent(R.prop[1] + R.prop[2])`) to be useful. Adding PC3 only provides 7% more explanation, which may not be necessary in context of data this size. 
+* Maintaining simplicity by sticking with two components versus 3 or more.
+* We've reduced dimensions by 60% (from 5 down to 2), which for a larger dataset would be phenominal. 
+
+```{r message=FALSE, warning=FALSE}
+library("factoextra")
+fviz_pca_ind(probe.pca, geom.ind = "point", pointshape = 21, 
+             pointsize = 2, 
+             fill.ind = probe$subject_number, 
+             col.ind = "black", 
+             palette = "jco",
+             label = "var",
+             col.var = "black",
+             repel = TRUE) +
+  ggtitle("2 Dimension PCA-plot from 5 feature dataset") +
+  theme_linedraw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
