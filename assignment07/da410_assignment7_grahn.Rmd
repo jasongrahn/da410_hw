@@ -86,7 +86,8 @@ predict(probe.pca,
 
 # a) Use both S and R. 
 ## Show your S and R matrix, and the corresponding eigenvalues and eigenvectors of S and R to get full credits
-```{r using covariance S}
+### Using R
+```{r using correlation R}
 # Center and scale
 probe.scaled <- scale(probe.var, 
                       center = TRUE, 
@@ -103,7 +104,8 @@ res.cor <- cor(probe.scaled)
 round(res.eig$values/(sum(res.eig$values)), 4)
 ```
 
-```{r using correlation R}
+### Using S
+```{r using covariance S}
 # 1. Covariance matrix
 res.cov <- cov(probe.scaled)
 round(res.cov, 2)
