@@ -86,6 +86,9 @@ plot(probe.pca$x[,1],
 # Predict PCs
 predict(probe.pca, 
         newdata = tail(log(probe.var), 2))
+
+
+round(sum(summary(probe.pca)$importance[2,]), 2)
 ```
 
 

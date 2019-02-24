@@ -73,3 +73,5 @@ var_exp %>%
        title = "Variance explained by each principal component")
 ```
 
+
+
