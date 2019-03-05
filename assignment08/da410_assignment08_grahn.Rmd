@@ -1,0 +1,25 @@
+---
+title: "assignment08"
+author: "Jason Grahn"
+date: "3/5/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+corMax <- cor(data)
+eigenValue <- eigen(corMax)
+C <- eigenValue$vectors[,1:2]
+D1 <- diag(eigenValue$values[1:2], nrow =2, ncol =2)
+loadings <- C %*% sqrt(D1)
+S.h2 <- rowSums(loadings^2)
+S.u2 <- diag(corMax)-S.h2
+prop.var <- cbind(eigenValue$values[1] / sum(eigenValue$values), eigenValue$values[2] / sum(eigenValue$values))
+
+```
+
