@@ -6,20 +6,60 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+library(magrittr)
+library(dplyr)
 ```
 
+#Problem 13.7(a)
+
+## 13.7 Use the words data of Table 5.9.
+
+### (a) Obtain principal component loadings for two factors.
+```{r}
+essay <- read.table(here::here("assignment08/T5_9_ESSAY.DAT")) %>% 
+  rename(student = V1,
+         y1 = V2, # informal_words
+         y2 = V3, # informal_verbs
+         x1 = V4, # formal_words
+         x2 = V5) %>% # formal_verbs
+  select(y1:x2)
+
+head(essay,3)
+```
 
 ```{r}
-
-corMax <- cor(data)
-eigenValue <- eigen(corMax)
-C <- eigenValue$vectors[,1:2]
-D1 <- diag(eigenValue$values[1:2], nrow =2, ncol =2)
-loadings <- C %*% sqrt(D1)
-S.h2 <- rowSums(loadings^2)
-S.u2 <- diag(corMax)-S.h2
-prop.var <- cbind(eigenValue$values[1] / sum(eigenValue$values), eigenValue$values[2] / sum(eigenValue$values))
-
+# obtain the corralation matrix of the essay data
+corMax <- cor(essay)
+corMax
 ```
+
+```{r}
+#obtain the eigenvalues from the correlation matrix
+eigenValue <- eigen(corMax)
+eigenValue
+```
+
+```{r}
+# keep only the first two columns of vectors into matrix "C"
+## we're keeping only the first two columns because that's the intent of the question
+C <- eigenValue$vectors[,1:2] 
+C
+```
+
+```{r}
+# keep only the first two eigenvalues as matrix "D1"
+D1 <- diag(eigenValue$values[1:2], 
+           nrow =2, 
+           ncol =2)
+D1
+```
+
+```{r}
+#build loadings from C and D1
+loadings <- C %*% (D1^(1/2))
+loadings
+```
+
+Factor loadings are correlations between the factors and each of the variables. Reviewing the factor loadings for the dataset shows that Factor 1 has a strong relationships with ALL variables and can be considered practically significant across the board. When we review factor 2, we see some practical significance, however, we also see much weaker correlation for the $2^{nd}$ and $3^{rd}$ variables `informal_verbs` and `formal_words`.
 
