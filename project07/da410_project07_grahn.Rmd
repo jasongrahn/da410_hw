@@ -1,0 +1,44 @@
+---
+title: "da410_project07_grahn"
+author: "Jason Grahn"
+date: "3/5/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+library(magrittr)
+library(dplyr)
+library(psych)
+```
+
+#Use R to solve Chapter 13 Page 476, #13.7(a). 
+Make sure you include the commands and outputs, as well as the interpretations of the outputs.
+
+##Problem 13.7(a)
+
+### 13.7 Use the words data of Table 5.9.
+
+#### (a) Obtain principal component loadings for two factors.
+```{r load data}
+data <- read.table(here::here("assignment08/T5_9_ESSAY.DAT")) %>% 
+  rename(student = V1,
+         y1 = V2, # informal_words
+         y2 = V3, # informal_verbs
+         x1 = V4, # formal_words
+         x2 = V5) %>% # formal_verbs
+  select(y1:x2)
+
+head(data,3)
+```
+
+```{r}
+# Using Principal Components Analysis method with correclation matrix
+fit <- principal(data, 
+                 nfactors = 2, 
+                 rotate = 'none', 
+                 covar = FALSE)
+fit[2]
+```
+```
+
