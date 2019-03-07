@@ -2,7 +2,7 @@
 title: "assignment08"
 author: "Jason Grahn"
 date: "3/5/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}

@@ -2,7 +2,7 @@
 title: "da410_project07_grahn"
 author: "Jason Grahn"
 date: "3/5/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -38,7 +38,7 @@ fit <- principal(data,
                  nfactors = 2, 
                  rotate = 'none', 
                  covar = FALSE)
-fit[2]
-```
+fit
 ```
 
+Factor loadings are correlations between the factors and each of the variables. Reviewing the factor loadings for the dataset shows that Factor 1 has a strong relationships with ALL variables and can be considered practically significant across the board. When we review factor 2, we see some practical significance, however, we also see much weaker correlation for the $2^{nd}$ and $3^{rd}$ variables `informal_verbs` and `formal_words`.
