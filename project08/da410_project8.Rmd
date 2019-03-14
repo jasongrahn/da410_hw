@@ -2,12 +2,15 @@
 title: "da410_project08"
 author: "jason grahn"
 date: "3/9/2019"
-output: github_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(lavaan) 
+```
+
+```{r}
 head(HolzingerSwineford1939,5)
 ```
 
@@ -18,14 +21,33 @@ HS.model <- ' visual  =~ x1 + x2 + x3
 HS.model
 ```
 
+This code block builds the structured model that will be used by the lavaan technique. The `Visual` latent variable is measured by the `x1`, `x2`, and `x3` variables; `Textual` is measured by `x4`, `x5`, and `x6`; and `Speed` is measured by `x7`, `x8`, and `x9`. For this example, we aren't working with any covariances. 
+
 ```{r}
 fit <- sem(HS.model, 
            data = HolzingerSwineford1939)
 fit
 ```
 
+SEM stands for Structural Equation Modeling and allows us to apply variable heirarchies. Because we built the structure in the previous code block, in this one we apply the SEM method _to_ that model. This output tells us the model fit statististic (85.306) the degrees of freedom being used to test it; and the chi-square p-value of that fit. We have a brilliant fit with this as we see in the `0` p-value. 
+
 ```{r}
 summary(fit, 
-        standardized=TRUE)
+        standardized = TRUE,
+        fit.measures = TRUE)
 ```
 
+There's a LOT of output to this. The latent variables have been standardized and each of their estimates have been provided, as well as the measurements that comprise them. Down the line, we see statistically significant p-values, which is great. The Covariances are included, showing us that we have low estimates for each of those.
+
+CFI = 0.931
+TLI = 0.896
+RMSEA =  0.092
+SRMR = 0.065
+
+
+While CFI is not greater than 0.95, it IS fairly close; unfortuntely, TLI also falls a little short. RMSEA is a more important measure though, and we want this less than 0.05. We can see that we are at 0.092. This is greater than 0.05. We'd also like to see SRMR at less than 0.06. We are unfortunately higher than that as well. 
+
+Since all of these are at inappropriate levels, we can determine this is not an ideal model; that the model fit is _not_ good, despite passing the chi-square test. 
+
+
+Reference: https://personality-project.org/r/tutorials/summerschool.14/rosseel_sem_intro.pdf
